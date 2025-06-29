@@ -1,0 +1,18 @@
+# Ignore CircuitPython libraries
+lib/
+
+# Ignore secrets and credentials
+settings.toml
+
+# Python bytecode and cache
+__pycache__/
+*.pyc
+
+# Editor/IDE folders
+.vscode/
+.idea/
+*.sublime-*
+
+# OS-generated files
+.DS_Store
+Thumbs.db
