@@ -4,6 +4,7 @@ I have an air conditioner temperature controller with a mind of its own. I also 
 
 I thought this project would be a great chance to implement Kafka and the MQTT protocol in a home setup.
 
+```
     +-------------+                             +--------Raspberry Pi 5------------------+
   +-------------+ |                             |   +-------------+       +----------+   |
 +-------------+ | |  -----temperature data--------->| MQTT broker |       | Postgres |   |
