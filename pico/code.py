@@ -14,8 +14,8 @@ password = os.getenv("CIRCUITPY_WIFI_PASSWORD")
 
 # MQTT broker details
 MQTT_BROKER = os.getenv("MQTT_BROKER_ADDRESS")
-MQTT_PORT = 1883
-MQTT_TOPIC = "sensor/data"
+MQTT_PORT = os.getenv("MQTT_PORT")
+MQTT_TOPIC = os.getenv("MQTT_TOPIC")
 
 # Unique identifier for this Pico W
 SENSOR_ID = "PICO_W_01"
@@ -33,19 +33,19 @@ sensor1 = adafruit_ahtx0.AHTx0(i2c0)
 i2c1 = busio.I2C(board.GP3, board.GP2)
 sensor2 = adafruit_ahtx0.AHTx0(i2c1)
 
-# # Set up MQTT client
-# pool = socketpool.SocketPool(wifi.radio)
-# mqtt_client = MQTT.MQTT(
-#     broker=MQTT_BROKER,
-#     port=MQTT_PORT,
-#     socket_pool=pool,
-# )
+# Set up MQTT client
+pool = socketpool.SocketPool(wifi.radio)
+mqtt_client = MQTT.MQTT(
+    broker=MQTT_BROKER,
+    port=MQTT_PORT,
+    socket_pool=pool,
+)
 
-# def connect(client, userdata, flags, rc):
-#     print("Connected to MQTT broker!")
+def connect(client, userdata, flags, rc):
+    print("Connected to MQTT broker!")
 
-# mqtt_client.on_connect = connect
-# mqtt_client.connect()
+mqtt_client.on_connect = connect
+mqtt_client.connect()
 
 while True:
     # Read data from both sensors
@@ -62,6 +62,6 @@ while True:
 
     # Publish to MQTT
     print(f"Publishing: {payload}")
-    # mqtt_client.publish(MQTT_TOPIC, payload)
+    mqtt_client.publish(MQTT_TOPIC, payload)
 
     time.sleep(1)  # Adjust interval as needed
