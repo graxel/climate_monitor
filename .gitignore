@@ -1,8 +1,9 @@
 # Ignore CircuitPython libraries
-lib/
+pico/lib/
 
 # Ignore secrets and credentials
-settings.toml
+pico/settings.toml
+server/.env
 
 # Python bytecode and cache
 __pycache__/
