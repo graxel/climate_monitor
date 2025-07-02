@@ -4,6 +4,7 @@ pico/lib/
 # Ignore secrets and credentials
 pico/settings.toml
 server/.env
+viewer/.env
 
 # Python bytecode and cache
 __pycache__/

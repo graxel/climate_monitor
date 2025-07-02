@@ -48,15 +48,11 @@ pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())
 response = requests.get("http://worldtimeapi.org/api/ip")
 data = response.json()
-datetime_str = data["datetime"]
-dt = adafruit_datetime.datetime.fromisoformat(datetime_str)
 
-# Convert to struct_time for RTC
-struct_time = time.struct_time((
-    dt.year, dt.month, dt.day,
-    dt.hour, dt.minute, dt.second,
-    dt.weekday(), -1, -1
-))
+unixtime = data["unixtime"]  # This is already in seconds since epoch (UTC)
+
+# Convert unixtime to struct_time for RTC
+struct_time = time.localtime(unixtime)  # struct_time in UTC
 
 # Set the RTC
 rtc.RTC().datetime = struct_time
