@@ -5,6 +5,7 @@ pico/lib/
 pico/settings.toml
 server/.env
 viewer/.env
+viewer/.streamlit/secrets.toml
 
 # Python bytecode and cache
 __pycache__/

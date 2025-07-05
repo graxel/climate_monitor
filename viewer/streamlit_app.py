@@ -78,7 +78,7 @@ for _ in range(200):
 
     with placeholder.container():
         st.subheader("Interactive Plot (Live from Database)")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, key="live_plot")
 
         st.subheader("Live Data Values (Superimposed)")
         st.markdown(f"""
@@ -91,4 +91,4 @@ for _ in range(200):
                 <div class="overlay-label label5">Value 5: {values[4]}</div>
             </div>
         """, unsafe_allow_html=True)
-    time.sleep(1)
+    time.sleep(10)
