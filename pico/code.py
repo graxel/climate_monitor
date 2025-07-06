@@ -25,9 +25,7 @@ password = os.getenv("CIRCUITPY_WIFI_PASSWORD")
 MQTT_BROKER = os.getenv("MQTT_BROKER_ADDRESS")
 MQTT_PORT = int(os.getenv("MQTT_PORT"))
 MQTT_TOPIC = os.getenv("MQTT_TOPIC")
-
-# Unique identifier for this Pico W
-SENSOR_ID = "PICO_W_01"
+SENSOR_ID = os.getenv("SENSOR_ID")
 
 # Connect to Wi-Fi
 print("Connecting to Wi-Fi...")
