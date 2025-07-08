@@ -63,7 +63,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Main live update loop ---
-for _ in range(200):
+for u in range(200):
     # --- Query the database for live data ---
     df = fetch_live_data()
     # For demo, use the last 'points' rows and a column called 'value'
@@ -78,7 +78,7 @@ for _ in range(200):
 
     with placeholder.container():
         st.subheader("Interactive Plot (Live from Database)")
-        st.plotly_chart(fig, use_container_width=True, key="live_plot")
+        st.plotly_chart(fig, use_container_width=True, key=f"live_plot_{u}")
 
         st.subheader("Live Data Values (Superimposed)")
         st.markdown(f"""

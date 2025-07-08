@@ -3,9 +3,11 @@ pico/lib/
 
 # Ignore secrets and credentials
 pico/settings.toml
-server/.env
-viewer/.env
-viewer/.streamlit/secrets.toml
+*/.env
+*/.streamlit/secrets.toml
+
+# Virtual environments
+*/.venv
 
 # Python bytecode and cache
 __pycache__/
