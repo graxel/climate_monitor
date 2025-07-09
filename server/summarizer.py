@@ -1,8 +1,17 @@
+import os
 import pandas as pd
+from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
+load_dotenv()
 
-# Setup your DB connection
-engine = create_engine("postgresql+psycopg2://USER:PASSWORD@HOST:PORT/DBNAME")
+PG_HOST = os.getenv('PG_HOST')
+PG_PORT = os.getenv('PG_PORT')
+PG_DB = os.getenv('PG_DB')
+PG_USER = os.getenv('PG_USER')
+PG_PASSWORD = os.getenv('PG_PASSWORD')
+
+db_url = f"postgresql+psycopg2://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
+engine = create_engine(db_url)
 
 # 1. Find latest aggregated interval
 with engine.connect() as conn:
@@ -13,7 +22,7 @@ with engine.connect() as conn:
 lower_bound = latest_history if latest_history else '1970-01-01'
 
 query = f"""
-    SELECT sensor_id, obs_time, temp1, hum1
+    SELECT sensor_id, obs_time, temp1, hum1, temp2, hum2
     FROM observations
     WHERE obs_time > '{lower_bound}'
 """
