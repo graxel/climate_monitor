@@ -1,0 +1,13 @@
+[Unit]
+Description=MQTT to Postgres Bridge (Poetry)
+After=network.target
+
+[Service]
+Type=simple
+User=__USERNAME__
+WorkingDirectory=/home/__USERNAME__/climate_monitor
+ExecStart=/home/__USERNAME__/.local/bin/poetry run python mqtt_postgres_bridge.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
