@@ -5,7 +5,8 @@ After=network.target
 [Service]
 Type=simple
 User=__USERNAME__
-WorkingDirectory=/home/__USERNAME__/climate_monitor
+EnvironmentFile=/home/__USERNAME__/climate_monitor/server/.env
+WorkingDirectory=/home/__USERNAME__/climate_monitor/server
 ExecStart=/home/__USERNAME__/.local/bin/poetry run python mqtt_postgres_bridge.py
 Restart=always
 

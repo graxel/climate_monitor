@@ -4,5 +4,6 @@ Description=Aggregate data to 10 minute intervals
 [Service]
 Type=oneshot
 User=__USERNAME__
-WorkingDirectory=/home/__USERNAME__/climate_monitor
+EnvironmentFile=/home/__USERNAME__/climate_monitor/server/.env
+WorkingDirectory=/home/__USERNAME__/climate_monitor/server
 ExecStart=/home/__USERNAME__/.local/bin/poetry run python summarizer.py
