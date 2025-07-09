@@ -1,0 +1,9 @@
+[Unit]
+Description=Run summarizer.py every 10 minutes (offset by 1 minute)
+
+[Timer]
+OnCalendar=*:01,11,21,31,41,51
+Persistent=true
+
+[Install]
+WantedBy=timers.target
