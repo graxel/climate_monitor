@@ -1,3 +1,7 @@
+# =========================
+# 1. Import Packages
+# =========================
+
 import streamlit as st
 import datetime
 from datetime import timedelta
@@ -8,39 +12,9 @@ import plotly.graph_objects as go
 from sqlalchemy import create_engine
 from streamlit_autorefresh import st_autorefresh
 
-st.set_page_config(page_title="Live Data Dashboard", layout="wide")
-st.title("Live Data Dashboard")
-
-# --- CSS for overlaying values on the image ---
-st.markdown("""
-    <style>
-    .overlay-container {
-        position: relative;
-        width: 600px;
-        margin: auto;
-    }
-    .overlay-image {
-        width: 100%;
-        display: block;
-        border-radius: 8px;
-    }
-    .overlay-label {
-        position: absolute;
-        color: white;
-        font-size: 1.5em;
-        font-weight: bold;
-        text-shadow: 2px 2px 4px #000;
-    }
-    .label1 { bottom: 10%; right: 10%; }
-    .label2 { top: 10%; right: 10%; }
-    .label3 { top: 50%; left: 45%; }
-    .label4 { bottom: 10%; left: 10%; }
-    .label5 { top: 10%; left: 10%; }
-    </style>
-""", unsafe_allow_html=True)
-
-# --- Image for overlay ---
-image_url = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80"
+# =========================
+# 2. Get Data
+# =========================
 
 # --- Database connection ---
 DB_HOST = st.secrets['DB_HOST']
@@ -62,12 +36,9 @@ query = """
 def load_data():
     return pd.read_sql_query(query, engine).sort_values('obs_time', ascending=True)
 
-if st.button("🔄 Refresh Data"):
-    st.cache_data.clear()
-
 df = load_data()
 
-
+# --- Data preprocessing ---
 if 'temp' in df.columns:
     df['temp_f'] = (df['temp'] * 9 / 5 + 32).round(1)
 else:
@@ -80,31 +51,11 @@ legend_order = [
     'PICO_W_04'
 ]
 
-# --- Ensure obs_time is datetime and create list of Python datetimes for slider ---
 df['obs_time'] = pd.to_datetime(df['obs_time'])
 timestamps_dt = [dt.to_pydatetime() for dt in df['obs_time'].sort_values().unique()]
 
-# --- Layout: Plot and slider in col1, overlay in col2 ---
-# --- Layout: Plot and slider in col1, overlay in col2 ---
-col1, col2 = st.columns(2)
 
-with col1:
-    st.subheader("Interactive Plot (Live from Database)")
-
-    # 1. Show the plotly chart placeholder (will fill it after the slider)
-    plot_placeholder = st.empty()
-
-    # 2. Show the slider (this will appear above the plot in code, but we will fill the plot placeholder after)
-    selected_time = st.slider(
-        "Select time for overlay",
-        min_value=timestamps_dt[0],
-        max_value=timestamps_dt[-1],
-        value=timestamps_dt[-1],
-        step=timedelta(minutes=10),
-        format="YYYY-MM-DD HH:mm"
-    )
-
-    # 3. Build the plot using the selected_time
+def make_plot(df, selected_time):
     fig = px.line(
         df,
         x='obs_time',
@@ -156,12 +107,73 @@ with col1:
                     showlegend=False
                 )
             )
+    return fig
 
-    # 4. Fill the plot placeholder (so the plot appears below the slider)
+# =========================
+# 3. Page Layout and UI
+# =========================
+
+st.set_page_config(page_title="Live Data Dashboard", layout="wide")
+st.title("Live Data Dashboard")
+
+col1, col2 = st.columns(2)
+
+# --- Column 1: Plot and Refresh Button ---
+with col1:
+    # Refresh Button
+    if st.button("🔄 Refresh Data"):
+        st.cache_data.clear()
+        st.experimental_rerun()
+
+    st.subheader("Interactive Plot (Live from Database)")
+
+    plot_placeholder = st.empty()
+
+    selected_time = st.slider(
+        "Select time for overlay",
+        min_value=timestamps_dt[0],
+        max_value=timestamps_dt[-1],
+        value=timestamps_dt[-1],
+        step=timedelta(minutes=10),
+        format="YYYY-MM-DD HH:mm"
+    )
+
+    # Build the plot using the selected_time
+    fig = make_plot(df, selected_time)
     plot_placeholder.plotly_chart(fig, use_container_width=True)
 
-
+# --- Column 2: Overlay Section ---
 with col2:
+    # CSS for overlaying values on the image
+    st.markdown("""
+        <style>
+        .overlay-container {
+            position: relative;
+            width: 600px;
+            margin: auto;
+        }
+        .overlay-image {
+            width: 100%;
+            display: block;
+            border-radius: 8px;
+        }
+        .overlay-label {
+            position: absolute;
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px #000;
+        }
+        .label1 { bottom: 20%; right: 10%; }
+        .label2 { bottom: 20%; right: 30%; }
+        .label3 { top: 25%; right: 20%; }
+        .label4 { top: 20%; left: 10%; }
+        .label5 { bottom: 20%; left: 10%; }
+        </style>
+    """, unsafe_allow_html=True)
+
+    image_url = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80"
+
     # Find overlay values for selected time
     selected_df = df[df['obs_time'] == pd.Timestamp(selected_time)]
     overlay_values = []
