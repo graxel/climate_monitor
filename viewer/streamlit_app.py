@@ -194,3 +194,41 @@ with col2:
         <div class="overlay-label label5">other: {overlay_values[4]}</div>
     </div>
     """, unsafe_allow_html=True)
+
+
+
+# =========================
+# 4. Project Explainer
+# =========================
+
+st.markdown("---")  # Horizontal rule for separation
+
+st.header("About This Project")
+
+exp_col1, exp_col2 = st.columns(2)
+
+with exp_col1:
+    st.subheader("Hardware & Data Collection")
+    st.markdown("""
+    - **Raspberry Pi Pico W** microcontrollers used as the core hardware.
+    - Each Pico W is connected to **two AHT21 temperature/humidity sensors**.
+    - Devices programmed with **CircuitPython** for rapid prototyping and easy sensor integration.
+    - Data is sent using the **MQTT protocol** to a central server.
+    - A **PostgreSQL database** stores all incoming sensor data, designed for efficient time-series storage.
+    - Breadboard prototype successfully tested.
+    - Final circuit was designed, soldered, and assembled for real-world deployment.
+    """)
+    st.image("path/to/breadboard_photo.jpg", caption="Breadboard Prototype", use_column_width=True)
+    st.image("path/to/soldered_photo.jpg", caption="Soldered Final Assembly", use_column_width=True)
+
+with exp_col2:
+    st.subheader("Software & Visualization")
+    st.markdown("""
+    - **MQTT server** receives sensor data and writes to the database.
+    - **Database schema** designed for scalable, multi-sensor time series data.
+    - Used **circup** and **poetry** for CircuitPython and Python dependency management.
+    - This dashboard built with **Streamlit** for live data visualization and interaction.
+    - Interactive plots show real-time and historical sensor readings.
+    - Overlay feature displays current values directly on a floorplan image.
+    """)
+    st.image("path/to/pico_photo.jpg", caption="Pico W with Sensors", use_column_width=True)
