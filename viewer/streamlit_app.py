@@ -218,17 +218,17 @@ with exp_col1:
     - Breadboard prototype successfully tested.
     - Final circuit was designed, soldered, and assembled for real-world deployment.
     """)
-    st.image("path/to/breadboard_photo.jpg", caption="Breadboard Prototype", use_column_width=True)
-    st.image("path/to/soldered_photo.jpg", caption="Soldered Final Assembly", use_column_width=True)
+    st.image("breadboard.jpg", caption="Breadboard Prototype", use_container_width=True)
+    st.image("soldered_sensors.jpg", caption="Soldered Final Assembly", use_container_width=True)
 
 with exp_col2:
     st.subheader("Software & Visualization")
     st.markdown("""
     - **MQTT server** receives sensor data and writes to the database.
     - **Database schema** designed for scalable, multi-sensor time series data.
-    - Used **circup** and **poetry** for CircuitPython and Python dependency management.
+    - Used `circup` and `poetry` for CircuitPython and Python dependency management.
     - This dashboard built with **Streamlit** for live data visualization and interaction.
     - Interactive plots show real-time and historical sensor readings.
     - Overlay feature displays current values directly on a floorplan image.
     """)
-    st.image("path/to/pico_photo.jpg", caption="Pico W with Sensors", use_column_width=True)
+    st.image("https://static1.makeuseofimages.com/wordpress/wp-content/uploads/2022/07/Raspberry-Pi-Pico-W.jpg", caption="Pico W with Sensors", use_container_width=True)
