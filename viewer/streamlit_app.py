@@ -218,7 +218,7 @@ with exp_col1:
     - Breadboard prototype successfully tested.
     - Final circuit was designed, soldered, and assembled for real-world deployment.
     """)
-    st.image("breadboard.jpg", caption="Breadboard Prototype", use_container_width=True)
+    st.image("viewer/breadboard.jpg", caption="Breadboard Prototype", use_container_width=True)
     st.image("soldered_sensors.jpg", caption="Soldered Final Assembly", use_container_width=True)
 
 with exp_col2:
