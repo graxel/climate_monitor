@@ -152,7 +152,7 @@ with col2:
         .overlay-label {
             position: absolute;
             color: black;
-            font-size: 1.1em;
+            font-size: 1em;
             /*font-weight: bold; */
             text-shadow: 0px 0px 4px #FFF;
         }
