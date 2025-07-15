@@ -1,7 +1,4 @@
-# =========================
-# 1. Import Packages
-# =========================
-
+import os
 import streamlit as st
 import datetime
 from datetime import timedelta
@@ -11,6 +8,12 @@ import plotly.express as px
 import plotly.graph_objects as go
 from sqlalchemy import create_engine
 from streamlit_autorefresh import st_autorefresh
+
+
+if os.path.basename(os.getcwd()) == "viewer":
+    asset_prefix = ""
+else:
+    asset_prefix = "viewer/"
 
 # =========================
 # 2. Get Data
@@ -40,7 +43,7 @@ df = load_data()
 
 # --- Data preprocessing ---
 if 'temp' in df.columns:
-    df['temp_f'] = (df['temp'] * 9 / 5 + 32).round(1)
+    df['temp_f'] = (df['temp'] * 9 / 5 + 32)
 else:
     df['temp_f'] = np.nan
 
@@ -123,7 +126,7 @@ with col1:
     # Refresh Button
     if st.button("🔄 Refresh Data"):
         st.cache_data.clear()
-        st.experimental_rerun()
+        st.rerun()
 
     st.subheader("Interactive Plot (Live from Database)")
 
@@ -165,9 +168,9 @@ with col2:
             text-shadow: 2px 2px 4px #000;
         }
         .label1 { bottom: 20%; right: 10%; }
-        .label2 { bottom: 20%; right: 30%; }
-        .label3 { top: 25%; right: 20%; }
-        .label4 { top: 20%; left: 10%; }
+        .label2 { bottom: 35%; right: 30%; }
+        .label3 { top: 20%; right: 20%; }
+        .label4 { top: 15%; left: 10%; }
         .label5 { bottom: 20%; left: 10%; }
         </style>
     """, unsafe_allow_html=True)
@@ -178,8 +181,8 @@ with col2:
     selected_df = df[df['obs_time'] == pd.Timestamp(selected_time)]
     overlay_values = []
     for sensor in legend_order:
-        val = selected_df[selected_df['sensor_id'] == sensor]['temp_f']
-        overlay_values.append(val.values[0] if not val.empty else "N/A")
+        val = selected_df[selected_df['sensor_id'] == sensor]['temp_f'].round(1)
+        overlay_values.append(str(val.values[0]) + "°F" if not val.empty else "N/A")
     while len(overlay_values) < 5:
         overlay_values.append("N/A")
 
@@ -205,30 +208,75 @@ st.markdown("---")  # Horizontal rule for separation
 
 st.header("About This Project")
 
-exp_col1, exp_col2 = st.columns(2)
+st.subheader("Overview")
+overview_col1, overview_col2 = st.columns([0.55, 0.45])
+with overview_col1:
+    st.markdown(
+    """
+    My air conditioner has been acting unpredictably for the past two summers, and
+    living in a top-floor loft produces some large temperature gradients in my apartment
+    in the summer. I was struggling to maintain a stable temperature in my home, and didn't want
+    to run the air conditioner more than I had to, so like any engineer, I knew what I had to do:
+    build a complicated system and figure out what exactly was going on.
 
-with exp_col1:
-    st.subheader("Hardware & Data Collection")
-    st.markdown("""
-    - **Raspberry Pi Pico W** microcontrollers used as the core hardware.
-    - Each Pico W is connected to **two AHT21 temperature/humidity sensors**.
-    - Devices programmed with **CircuitPython** for rapid prototyping and easy sensor integration.
-    - Data is sent using the **MQTT protocol** to a central server.
-    - A **PostgreSQL database** stores all incoming sensor data, designed for efficient time-series storage.
-    - Breadboard prototype successfully tested.
-    - Final circuit was designed, soldered, and assembled for real-world deployment.
+    As depicted in the figure at right, the system is composed of three major components; sensors,
+    a home server, and a web application deployed on Streamlit Cloud. The sensors gather
+    temperature and humidity data, send it via MQTT protocol to the server, where an MQTT broker
+    receives the data. Another process subscribes to the MQTT channel and inserts the incoming data
+    into a Postgres database. Yet another process resamples the raw data to ten minute intervals.
+    When the webpage is loaded, the application queries the database for the historical data and
+    displays it like you see above. The sections that follow explain each component in detail.
     """)
-    st.image("viewer/breadboard.jpg", caption="Breadboard Prototype", use_container_width=True)
-    st.image("viewer/soldered_sensors.jpg", caption="Soldered Final Assembly", use_container_width=True)
+with overview_col2:
+    st.image(asset_prefix+"assets/high-level-diagram-2.jpg", caption="High Level Diagram")
 
-with exp_col2:
-    st.subheader("Software & Visualization")
-    st.markdown("""
-    - **MQTT server** receives sensor data and writes to the database.
-    - **Database schema** designed for scalable, multi-sensor time series data.
-    - Used `circup` and `poetry` for CircuitPython and Python dependency management.
-    - This dashboard built with **Streamlit** for live data visualization and interaction.
-    - Interactive plots show real-time and historical sensor readings.
-    - Overlay feature displays current values directly on a floorplan image.
+
+st.subheader("Sensors")
+sensors_col1, sensors_col2, sensors_col3 = st.columns([0.4, 0.35, 0.25])
+with sensors_col1:
+    st.markdown(
+    """
+    The sensors for this project are based on 
+    [Raspberry Pi Pico W](https://www.raspberrypi.com/products/raspberry-pi-pico/) microcontrollers.
+    These boards use a dual-core Arm Cortex-M0+ processor running up to 133 MHz and include
+    integrated 2.4GHz Wi-Fi connectivity, making them a great choice for wireless IoT applications.
+    Each device is equipped with two AHT21 temperature and humidity sensors for environmental 
+    monitoring. The hardware is assembled using a dead bug soldering style, where components are
+    mounted directly to each other in 3D space, rather than on a flat motherboard. This style was
+    chosen for its simplicity and elegant layout. The devices are programmed with
+    [CircuitPython](https://circuitpython.org), and use the
+    [`circup`](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/install-circup)
+    tool to manage dependencies. Once set up, the Pico W microcontrollers connect to Wi-Fi and send
+    sensor data to my home server using the [MQTT protocol](https://mqtt.org).
     """)
-    st.image("https://static1.makeuseofimages.com/wordpress/wp-content/uploads/2022/07/Raspberry-Pi-Pico-W.jpg", caption="Pico W with Sensors", use_container_width=True)
+
+with sensors_col2:
+    st.image(asset_prefix+"assets/soldered_sensors.jpg", caption="Soldered Final Assembly")
+
+with sensors_col3:
+    st.image("https://static1.makeuseofimages.com/wordpress/wp-content/uploads/2022/07/Raspberry-Pi-Pico-W.jpg", caption="Raspberry Pi Pico W")
+    st.image(asset_prefix+"assets/breadboard.jpg", caption="Breadboard Prototype")
+
+#     st.markdown("""
+#     - **Raspberry Pi Pico W** microcontrollers used as the core hardware.
+#     - Each Pico W is connected to **two AHT21 temperature/humidity sensors**.
+#     - Devices programmed with **CircuitPython** for rapid prototyping and easy sensor integration.
+#     - Data is sent using the **MQTT protocol** to a central server.
+#     - A **PostgreSQL database** stores all incoming sensor data, designed for efficient time-series storage.
+#     - Breadboard prototype successfully tested.
+#     - Final circuit was designed, soldered, and assembled for real-world deployment.
+#     """)
+#     st.image(asset_prefix+"assets/breadboard.jpg", caption="Breadboard Prototype")#, use_container_width=True)
+#     st.image(asset_prefix+"assets/soldered_sensors.jpg", caption="Soldered Final Assembly", use_container_width=True)
+
+# with exp_col2:
+#     st.subheader("Software & Visualization")
+#     st.markdown("""
+#     - **MQTT server** receives sensor data and writes to the database.
+#     - **Database schema** designed for scalable, multi-sensor time series data.
+#     - Used `circup` and `poetry` for CircuitPython and Python dependency management.
+#     - This dashboard built with **Streamlit** for live data visualization and interaction.
+#     - Interactive plots show real-time and historical sensor readings.
+#     - Overlay feature displays current values directly on a floorplan image.
+#     """)
+#     st.image("https://static1.makeuseofimages.com/wordpress/wp-content/uploads/2022/07/Raspberry-Pi-Pico-W.jpg", caption="Pico W with Sensors", use_container_width=True)
