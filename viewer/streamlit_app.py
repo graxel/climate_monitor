@@ -32,6 +32,7 @@ engine = create_engine(db_url)
 query = """
     SELECT *
     FROM hist_10m
+    WHERE obs_time >= CURRENT_DATE - INTERVAL '2 days'
     ORDER BY obs_time DESC
     """
 
@@ -77,7 +78,7 @@ def make_plot(df, selected_time):
         xaxis_title='Time',
         yaxis_title='Temperature',
         template='plotly_white',
-        margin=dict(l=40, r=40, t=60, b=40),
+        # margin=dict(l=40, r=40, t=60, b=40),
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -90,26 +91,17 @@ def make_plot(df, selected_time):
         #     type="date"
         # ),
     )
-    fig.update_xaxes(showgrid=True)
+    xmin = df['obs_time'].min()
+    xmax = df['obs_time'].max() + timedelta(hours=1)
+    fig.update_xaxes(showgrid=True, range=[xmin, xmax])
     fig.update_yaxes(showgrid=True)
 
-    # Add red dot indicators for each sensor at the selected time
-    for sensor in legend_order:
-        y_val = df[
-            (df['sensor_id'] == sensor) &
-            (df['obs_time'] == pd.Timestamp(selected_time))
-        ]['temp_f']
-        if not y_val.empty:
-            fig.add_trace(
-                go.Scatter(
-                    x=[selected_time],
-                    y=[y_val.values[0]],
-                    mode="markers",
-                    marker=dict(color="red", size=12, symbol="circle"),
-                    name=f"{sensor} selected",
-                    showlegend=False
-                )
-            )
+    fig.add_vline(
+        x=selected_time,
+        line_width=2,
+        line_dash="solid",
+        line_color="grey"
+    )
     return fig
 
 # =========================
@@ -119,7 +111,7 @@ def make_plot(df, selected_time):
 st.set_page_config(page_title="Live Data Dashboard", layout="wide")
 st.title("Live Data Dashboard")
 
-col1, col2 = st.columns(2)
+col1, col2 = st.columns(2, gap="medium")
 
 # --- Column 1: Plot and Refresh Button ---
 with col1:
@@ -129,7 +121,7 @@ with col1:
     plot_placeholder = st.empty()
 
     selected_time = st.slider(
-        "Select time for overlay",
+        "**Select time for overlay**",
         min_value=timestamps_dt[0],
         max_value=timestamps_dt[-1],
         value=timestamps_dt[-1],
@@ -159,13 +151,13 @@ with col2:
         }
         .overlay-label {
             position: absolute;
-            color: white;
-            font-size: 1em;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px #000;
+            color: black;
+            font-size: 1.1em;
+            /*font-weight: bold; */
+            text-shadow: 0px 0px 4px #FFF;
         }
         .label1 { bottom: 20%; right: 10%; }
-        .label2 { bottom: 35%; right: 30%; }
+        .label2 { bottom: 40%; right: 30%; }
         .label3 { top: 20%; right: 20%; }
         .label4 { top: 15%; left: 10%; }
         .label5 { bottom: 20%; left: 10%; }
@@ -188,10 +180,10 @@ with col2:
     st.markdown(f"""
     <div class="overlay-container">
         <img src="{image_url}" class="overlay-image"/>
-        <div class="overlay-label label1">Office: {overlay_values[0]}</div>
-        <div class="overlay-label label2">Kitchen: {overlay_values[1]}</div>
-        <div class="overlay-label label3">Closet: {overlay_values[2]}</div>
-        <div class="overlay-label label4">Bedroom: {overlay_values[3]}</div>
+        <div class="overlay-label label1">Office<br>PICO_W_01: {overlay_values[0]}</div>
+        <div class="overlay-label label2">Kitchen<br>PICO_W_02: {overlay_values[1]}</div>
+        <div class="overlay-label label3">Closet<br>PICO_W_03: {overlay_values[2]}</div>
+        <div class="overlay-label label4">Bedroom<br>PICO_W_04: {overlay_values[3]}</div>
         <div class="overlay-label label5">other: {overlay_values[4]}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -200,7 +192,14 @@ with col2:
     if st.button("🔄 Refresh Data"):
         st.cache_data.clear()
         st.rerun()
-
+    st.markdown(
+        """
+        Taking a look at the graph, you can see the sawtooth patterns when the air conditioner
+        cycles on and off. In the near future, I will be adding another sensor to indicate when
+        the air conditioner is running, as well as integrating local weather data. The end goal
+        is to understand the temperature gradients in my apartment better, and build an ML model
+        to proactively control the AC.
+        """)
 # =========================
 # 4. Project Explainer
 # =========================
