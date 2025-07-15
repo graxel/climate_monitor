@@ -85,10 +85,10 @@ def make_plot(df, selected_time):
             xanchor="right",
             x=1
         ),
-        xaxis=dict(
-            rangeslider=dict(visible=True),
-            type="date"
-        ),
+        # xaxis=dict(
+        #     rangeslider=dict(visible=True),
+        #     type="date"
+        # ),
     )
     fig.update_xaxes(showgrid=True)
     fig.update_yaxes(showgrid=True)
@@ -123,12 +123,8 @@ col1, col2 = st.columns(2)
 
 # --- Column 1: Plot and Refresh Button ---
 with col1:
-    # Refresh Button
-    if st.button("🔄 Refresh Data"):
-        st.cache_data.clear()
-        st.rerun()
 
-    st.subheader("Interactive Plot (Live from Database)")
+    st.subheader("Sensor Temperature History")
 
     plot_placeholder = st.empty()
 
@@ -147,15 +143,16 @@ with col1:
 
 # --- Column 2: Overlay Section ---
 with col2:
+
     # CSS for overlaying values on the image
     st.markdown("""
         <style>
         .overlay-container {
             position: relative;
-            width: 600px;
             margin: auto;
         }
         .overlay-image {
+            opacity: 0.4;
             width: 100%;
             display: block;
             border-radius: 8px;
@@ -163,7 +160,7 @@ with col2:
         .overlay-label {
             position: absolute;
             color: white;
-            font-size: 1.5em;
+            font-size: 1em;
             font-weight: bold;
             text-shadow: 2px 2px 4px #000;
         }
@@ -186,7 +183,8 @@ with col2:
     while len(overlay_values) < 5:
         overlay_values.append("N/A")
 
-    st.subheader("Live Data Values (Superimposed)")
+    st.subheader("Data Values for Selected Time")
+
     st.markdown(f"""
     <div class="overlay-container">
         <img src="{image_url}" class="overlay-image"/>
@@ -197,8 +195,11 @@ with col2:
         <div class="overlay-label label5">other: {overlay_values[4]}</div>
     </div>
     """, unsafe_allow_html=True)
-
-
+    st.markdown("")
+    # Refresh Button
+    if st.button("🔄 Refresh Data"):
+        st.cache_data.clear()
+        st.rerun()
 
 # =========================
 # 4. Project Explainer
@@ -209,7 +210,7 @@ st.markdown("---")  # Horizontal rule for separation
 st.header("About This Project")
 
 st.subheader("Overview")
-overview_col1, overview_col2 = st.columns([0.55, 0.45])
+overview_col1, overview_col2 = st.columns([0.5, 0.5])
 with overview_col1:
     st.markdown(
     """
@@ -219,7 +220,7 @@ with overview_col1:
     to run the air conditioner more than I had to, so like any engineer, I knew what I had to do:
     build a complicated system and figure out what exactly was going on.
 
-    As depicted in the figure at right, the system is composed of three major components; sensors,
+    As depicted, the system is composed of three major components; sensors,
     a home server, and a web application deployed on Streamlit Cloud. The sensors gather
     temperature and humidity data, send it via MQTT protocol to the server, where an MQTT broker
     receives the data. Another process subscribes to the MQTT channel and inserts the incoming data
@@ -232,7 +233,7 @@ with overview_col2:
 
 
 st.subheader("Sensors")
-sensors_col1, sensors_col2, sensors_col3 = st.columns([0.4, 0.35, 0.25])
+sensors_col1, sensors_col2 = st.columns([0.6, 0.4])
 with sensors_col1:
     st.markdown(
     """
@@ -245,18 +246,28 @@ with sensors_col1:
     mounted directly to each other in 3D space, rather than on a flat motherboard. This style was
     chosen for its simplicity and elegant layout. The devices are programmed with
     [CircuitPython](https://circuitpython.org), and use the
-    [`circup`](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/install-circup)
+    [Circup](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/install-circup)
     tool to manage dependencies. Once set up, the Pico W microcontrollers connect to Wi-Fi and send
     sensor data to my home server using the [MQTT protocol](https://mqtt.org).
     """)
-
-with sensors_col2:
     st.image(asset_prefix+"assets/soldered_sensors.jpg", caption="Soldered Final Assembly")
 
-with sensors_col3:
+    
+with sensors_col2:
     st.image("https://static1.makeuseofimages.com/wordpress/wp-content/uploads/2022/07/Raspberry-Pi-Pico-W.jpg", caption="Raspberry Pi Pico W")
+
     st.image(asset_prefix+"assets/breadboard.jpg", caption="Breadboard Prototype")
 
+st.subheader("Server")
+
+st.subheader("Webpage")
+
+st.subheader("Analysis")
+
+st.markdown(
+    """
+    These sections to follow soon!
+    """)
 #     st.markdown("""
 #     - **Raspberry Pi Pico W** microcontrollers used as the core hardware.
 #     - Each Pico W is connected to **two AHT21 temperature/humidity sensors**.
