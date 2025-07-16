@@ -48,13 +48,14 @@ if 'temp' in df.columns:
 else:
     df['temp_f'] = np.nan
 
-legend_order = [
-    'PICO_W_01',
-    'PICO_W_02',
-    'PICO_W_03',
-    'PICO_W_04'
-]
+legend_order = {
+    'PICO_W_01': 'Office',
+    'PICO_W_02': 'Kitchen',
+    'PICO_W_03': 'Closet',
+    'PICO_W_04': 'Bedroom'
+}
 
+df['sensor_loc'] = df['sensor_id'].map(legend_order)
 df['obs_time'] = pd.to_datetime(df['obs_time'])
 timestamps_dt = [dt.to_pydatetime() for dt in df['obs_time'].sort_values().unique()]
 
@@ -64,17 +65,17 @@ def make_plot(df, selected_time):
         df,
         x='obs_time',
         y='temp_f',
-        color='sensor_id',
+        color='sensor_loc',
         color_discrete_sequence=px.colors.qualitative.D3,
-        category_orders={'sensor_id': legend_order},
+        category_orders={'sensor_loc': legend_order.values()},
         labels={
             "obs_time": "Time",
             "temp_f": "Temperature",
-            "sensor_id": "Sensor"
+            # "sensor_loc": "Sensor"
         }
     )
     fig.update_layout(
-        legend_title_text='Sensor',
+        legend_title_text=None,#'Sensor',
         xaxis_title='Time',
         yaxis_title='Temperature',
         template='plotly_white',
@@ -149,18 +150,33 @@ with col2:
             display: block;
             border-radius: 8px;
         }
+.overlay-label {
+        position: absolute;
+        font-size: 1em;
+        text-align: center;
+        transition: color 0.3s ease;
+    }
+
+    /* Light mode styles */
+    @media (prefers-color-scheme: light) {
         .overlay-label {
-            position: absolute;
             color: black;
-            font-size: 1em;
-            /*font-weight: bold; */
             text-shadow: 0px 0px 4px #FFF;
         }
+    }
+
+    /* Dark mode styles */
+    @media (prefers-color-scheme: dark) {
+        .overlay-label {
+            color: white;
+            text-shadow: 0px 0px 4px #000;
+        }
+    }
         .label1 { bottom: 20%; right: 10%; }
         .label2 { bottom: 40%; right: 30%; }
         .label3 { top: 20%; right: 20%; }
         .label4 { top: 15%; left: 10%; }
-        .label5 { bottom: 20%; left: 10%; }
+        /*.label5 { bottom: 20%; left: 10%; }*/
         </style>
     """, unsafe_allow_html=True)
 
@@ -169,8 +185,8 @@ with col2:
     # Find overlay values for selected time
     selected_df = df[df['obs_time'] == pd.Timestamp(selected_time)]
     overlay_values = []
-    for sensor in legend_order:
-        val = selected_df[selected_df['sensor_id'] == sensor]['temp_f'].round(1)
+    for sensor in legend_order.values():
+        val = selected_df[selected_df['sensor_loc'] == sensor]['temp_f'].round(1)
         overlay_values.append(str(val.values[0]) + "°F" if not val.empty else "N/A")
     while len(overlay_values) < 5:
         overlay_values.append("N/A")
@@ -180,11 +196,11 @@ with col2:
     st.markdown(f"""
     <div class="overlay-container">
         <img src="{image_url}" class="overlay-image"/>
-        <div class="overlay-label label1">Office<br>PICO_W_01: {overlay_values[0]}</div>
-        <div class="overlay-label label2">Kitchen<br>PICO_W_02: {overlay_values[1]}</div>
-        <div class="overlay-label label3">Closet<br>PICO_W_03: {overlay_values[2]}</div>
-        <div class="overlay-label label4">Bedroom<br>PICO_W_04: {overlay_values[3]}</div>
-        <div class="overlay-label label5">other: {overlay_values[4]}</div>
+        <div class="overlay-label label1">Office<br>{overlay_values[0]}</div>
+        <div class="overlay-label label2">Kitchen<br>{overlay_values[1]}</div>
+        <div class="overlay-label label3">Closet<br>{overlay_values[2]}</div>
+        <div class="overlay-label label4">Bedroom<br>{overlay_values[3]}</div>
+        <!-- <div class="overlay-label label5">other: {overlay_values[4]}</div> -->
     </div>
     """, unsafe_allow_html=True)
     st.markdown("")
