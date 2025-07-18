@@ -1,0 +1,14 @@
+[Unit]
+Description=Websocket service for climate monitor website
+After=network.target
+
+[Service]
+Type=simple
+User=__USERNAME__
+EnvironmentFile=/home/__USERNAME__/climate_monitor/server/.env
+WorkingDirectory=/home/__USERNAME__/climate_monitor/server
+ExecStart=/home/__USERNAME__/.local/bin/poetry run python websocket_server.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
