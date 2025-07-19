@@ -2,97 +2,119 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Plotly WebSocket Live Test Plot</title>
+  <title>Live Temperature Dashboard</title>
   <script src="https://cdn.plot.ly/plotly-2.30.1.min.js"></script>
   <style>
     body { font-family: sans-serif; padding: 2em; }
-    #plot { width: 100%; max-width: 700px; height: 420px; margin: auto; }
+    #plot { width: 100%; max-width: 900px; height: 450px; margin: auto; }
     #ws-status { margin-bottom: 1em; }
   </style>
 </head>
 <body>
-  <h1>Plotly WebSocket Live Test Plot</h1>
-  <div id="ws-status">Connecting to websocket...</div>
+  <h1>Plotly WebSocket + REST Live Test Plot</h1>
+  <div id="ws-status">Initializing...</div>
   <div id="plot"></div>
+
   <script>
-    // Initial data
-    let xData = ['2025-07-19 09:00:00', '2025-07-19 09:00:10', '2025-07-19 09:00:20'];
-    let yData = [27, 26, 25];
+    // 1. CONFIG: Change to your public Flask API and WebSocket endpoints!
+    const FLASK_API_URL = "http://data.kevingrazel.com:5000/api/initial_data";
+    const WEBSOCKET_URL = "wss://data.kevingrazel.com:6789";
+
+    // 2. Data Arrays
+    let xData = [];
+    let yData = [];
+
+    // 3. Layout
     const layout = {
-      title: 'Test Temperature Plot (office_temp)',
+      title: 'Office Temperature (office_temp)',
       xaxis: { title: 'Timestamp', tickformat: "%H:%M %b %d", autorange:true },
       yaxis: { title: 'Temperature (°C)', autorange:true }
     };
 
-    // Initial empty plot
-    Plotly.newPlot('plot', [{
-      x: xData,
-      y: yData,
-      mode: 'lines+markers',
-      name: 'office_temp',
-      line: { color: '#1f77b4' }
-    }], layout);
-
-    // --- WebSocket integration ---
-    const wsUrl = "wss://data.kevingrazel.com:6789";
     const wsStatus = document.getElementById('ws-status');
 
-    let ws;
-    try {
-      ws = new WebSocket(wsUrl);
-    } catch (err) {
-      wsStatus.textContent = "WebSocket error: " + err;
-    }
+    // 4. Load the initial data from Flask
+    fetch(FLASK_API_URL)
+      .then(r => r.json())
+      .then(data => {
+        // Adjust field names here if your Flask output's structure ever changes
+        // data = { obs_time: [...], sensor_data: {office_temp: [...]}, ... }
+        if (!data.obs_time || !data.sensor_data || !data.sensor_data.office_temp) {
+          wsStatus.textContent = "Initial data: Missing expected fields";
+          return;
+        }
+        xData = data.obs_time;
+        yData = data.sensor_data.office_temp;
+        Plotly.newPlot('plot', [{
+          x: xData,
+          y: yData,
+          mode: 'lines+markers',
+          name: 'office_temp',
+          line: { color: '#1f77b4' }
+        }], layout);
+        wsStatus.textContent = "Plotted initial data, connecting to WebSocket...";
+        startWebSocket();
+      })
+      .catch(e => {
+        wsStatus.textContent = "Failed to load initial data: " + e;
+      });
 
-    ws.onopen = function() {
-      wsStatus.textContent = "🟢 Connected to " + wsUrl;
-    };
-    ws.onclose = function() {
-      wsStatus.textContent = "🔴 Disconnected";
-    };
-    ws.onerror = function() {
-      wsStatus.textContent = "⚠️  WebSocket error";
-    };
-
-    ws.onmessage = function(evt) {
-      let msg;
+    // 5. WebSocket live updates
+    function startWebSocket() {
+      let ws;
       try {
-        msg = JSON.parse(evt.data);
-      } catch (e) {
-        wsStatus.textContent = "[Decode error] " + evt.data;
+        ws = new WebSocket(WEBSOCKET_URL);
+      } catch (err) {
+        wsStatus.textContent = "WebSocket error: " + err;
         return;
       }
 
-      // Check data format is as you expect
-      if (
-        !msg.timestamp ||
-        !msg.sensor_data ||
-        typeof msg.sensor_data.office_temp !== "number"
-      ) {
-        wsStatus.textContent = "[Received invalid message] " + evt.data;
-        return;
-      }
+      ws.onopen = function() {
+        wsStatus.textContent = "🟢 WebSocket connected";
+      };
+      ws.onclose = function() {
+        wsStatus.textContent = "🔴 WebSocket disconnected";
+      };
+      ws.onerror = function() {
+        wsStatus.textContent = "⚠️ WebSocket error";
+      };
 
-      // Add to data arrays & update plot
-      const ts = msg.timestamp;
-      const val = msg.sensor_data.office_temp;
-      xData.push(ts);
-      yData.push(val);
+      ws.onmessage = function(evt) {
+        let msg;
+        try {
+          msg = JSON.parse(evt.data);
+        } catch (e) {
+          wsStatus.textContent = "[Decode error] " + evt.data;
+          return;
+        }
 
-      // Limit points
-    //   const N = 20;
-    //   if (xData.length > N) { xData = xData.slice(-N); yData = yData.slice(-N); }
+        // Must match your websocket message's structure
+        if (!msg.timestamp || !msg.sensor_data || typeof msg.sensor_data.office_temp !== "number") {
+          wsStatus.textContent = "[Bad message] " + evt.data;
+          return;
+        }
 
-      // Use Plotly.react to completely redraw
-      Plotly.react('plot', [{
+        xData.push(msg.timestamp);
+        yData.push(msg.sensor_data.office_temp);
+
+        // Optionally, limit points to keep the graph fast:
+        const N = 200;
+        if (xData.length > N) {
+          xData = xData.slice(-N);
+          yData = yData.slice(-N);
+        }
+
+        Plotly.react('plot', [{
         x: [...xData],
         y: [...yData],
-        mode: 'lines+markers',
-        name: 'office_temp',
-        line: { color: '#1f77b4' }
-      }], layout, {responsive: true});
-      wsStatus.textContent = `🟢 Last data: office_temp=${val}, time=${ts}`;
-    };
+          mode: 'lines+markers',
+          name: 'office_temp',
+          line: { color: '#1f77b4' }
+        }], layout, {responsive: true});
+
+        wsStatus.textContent = `🟢 Last: office_temp=${msg.sensor_data.office_temp}, time=${msg.timestamp}`;
+      };
+    }
   </script>
 </body>
 </html>
