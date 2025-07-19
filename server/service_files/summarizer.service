@@ -1,5 +1,5 @@
 [Unit]
-Description=Aggregate data to 10 minute intervals
+Description=Prepare data for webpage
 
 [Service]
 Type=oneshot

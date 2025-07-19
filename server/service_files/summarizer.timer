@@ -1,8 +1,8 @@
 [Unit]
-Description=Run summarizer.py every 10 minutes (offset by 1 minute)
+Description=Run summarizer.py every 5 minutes (offset by 3 minutes (3 > 2.5))
 
 [Timer]
-OnCalendar=*:01,11,21,31,41,51
+OnCalendar=*:03,08,13,18,23,28,33,38,43,48,53,58
 Persistent=true
 
 [Install]

@@ -15,7 +15,7 @@ engine = create_engine(db_url)
 
 # 1. Find latest aggregated interval
 with engine.connect() as conn:
-    result = conn.execute(text("SELECT MAX(obs_time) FROM hist_10m"))
+    result = conn.execute(text("SELECT MAX(obs_time) FROM webpage_plot_data"))
     latest_history = result.scalar()
 
 # 2. Query new data from raw table
@@ -32,25 +32,55 @@ if not df.empty:
 
     df['temp'] = (df['temp1'] + df['temp2']) / 2
     df['hum'] = (df['hum1'] + df['hum2']) / 2
+    df['temp_diff'] = df['temp1'] - df['temp2']
+    df['hum_diff'] = df['hum1'] - df['hum2']
 
-    # 3. Group by sensor_id and 10-min interval, average temp1 and hum1
-    df['interval_start'] = pd.to_datetime(df['obs_time']).dt.floor('10min')
+    df['temp_f'] = df['temp'] * 9 / 5 + 32
+
+    sensor_mapping = {
+        'PICO_W_01': 'office',
+        'PICO_W_02': 'kitchen',
+        'PICO_W_03': 'closet',
+        'PICO_W_04': 'bedroom',
+    }
+    df['sensor_loc'] = df['sensor_id'].map(sensor_mapping)
+
+    # 3. Group by sensor_id and 5-min interval, average temp1 and hum1
+    df['interval_time'] = pd.to_datetime(df['obs_time']).dt.round('5min')
     agg = (
-        df.groupby(['interval_start', 'sensor_id'],)
-            .agg(temp=('temp', 'mean'), hum=('hum', 'mean'))
+        df.groupby(['interval_time', 'sensor_loc'],)
+            .agg(temp=('temp_f', 'mean'), hum=('hum', 'mean'))
             .reset_index()
-            .rename(columns={'interval_start': 'obs_time'})
+            .rename(columns={'interval_time': 'obs_time'})
     )
-    hist_10m = agg[agg['obs_time'] < agg['obs_time'].max()]
 
-    # 4. Delete overlapping intervals in hist_10m and insert new aggregates
+    # leave off incomplete data at end
+    hist_5m = agg[agg['obs_time'] < agg['obs_time'].max()]
+
+    # from long format to wide
+    wide = hist_5m.pivot(
+        index='obs_time',
+        columns='sensor_loc',
+        values=['temp_f', 'hum']
+    ).swaplevel(axis=1).sort_index(axis=1).reset_index()
+
+    def flatten_col(col_tuple):
+        prefix = '' if col_tuple[0] == 'obs_time' else 'sensor__'
+
+        # Drop empty strings and join with underscores
+        return prefix + '_'.join([str(x) for x in col_tuple if x])
+
+    # flatten cols from multiindex to regular
+    wide.columns = [flatten_col(col) for col in wide.columns]
+
+    # 4. Delete overlapping intervals in webpage_plot_data and insert new aggregates
     with engine.begin() as conn:
-        min_interval = agg['obs_time'].min()
+        min_interval = wide['obs_time'].min()
         conn.execute(
             text("""
-                DELETE FROM hist_10m
+                DELETE FROM webpage_plot_data
                 WHERE obs_time >= :min_interval
             """),
             {"min_interval": min_interval}
         )
-        hist_10m.to_sql('hist_10m', conn, if_exists='append', index=False)
+        wide.to_sql('webpage_plot_data', conn, if_exists='append', index=False)
