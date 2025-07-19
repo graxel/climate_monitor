@@ -40,7 +40,7 @@ def initial_data():
         'weather_data': 'weather__'
     }
 
-    d = {'obs_time': df['obs_time'].head().to_list()}
+    d = {'obs_time': df['obs_time'].to_list()}
     for data_type_key, data_type_value in data_types.items():
         for col in df.columns:
             if col.startswith(data_type_value):
