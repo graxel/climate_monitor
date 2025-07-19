@@ -17,8 +17,6 @@ def get_db_connection():
     db_url = f"postgresql+psycopg2://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
     engine = create_engine(db_url)
     return engine
-
-def format_data():
     
 @app.route("/api/initial_data")
 def initial_data():
