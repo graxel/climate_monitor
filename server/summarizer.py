@@ -61,7 +61,7 @@ if not df.empty:
     wide = hist_5m.pivot(
         index='obs_time',
         columns='sensor_loc',
-        values=['temp_f', 'hum']
+        values=['temp', 'hum']
     ).swaplevel(axis=1).sort_index(axis=1).reset_index()
 
     def flatten_col(col_tuple):
