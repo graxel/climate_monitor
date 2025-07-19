@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Data Dashboard</title>
+  <meta name="viewport" content="width=825, initial-scale=1">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="https://cdn.plot.ly/plotly-2.30.1.min.js"></script>
+</head>
+<body>
+  <h1>Live Data Dashboard</h1>
+  <div class="container">
+    <div class="left">
+      <h3>Sensor Temperature History</h3>
+      <div id="temp-plot" style="height: 450px; width: 100%; min-width: 320px; max-width: 825px; background: #fff; border-radius: 4px; box-shadow: 0 2px 6px #0001; margin-bottom: 1.5em;"></div>
+      <div class="slider-section">
+        <label for="time-slider" class="slider-label">Select time for overlay</label>
+        <input type="range" id="time-slider" min="0" max="0" value="0" step="1">
+        <div style="display: flex; justify-content: space-between;">
+          <span id="slider-min">Waiting for data...</span>
+          <span id="slider-max"></span>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <h3>Data Values for Selected Time</h3>
+      <div class="overlay-container">
+        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" class="overlay-image" alt="Apartment background">
+        <div class="overlay-label label1" id="office-label">Office<br><span id="office-temp">--.-°F</span></div>
+        <div class="overlay-label label2" id="kitchen-label">Kitchen<br><span id="kitchen-temp">--.-°F</span></div>
+        <div class="overlay-label label3" id="closet-label">Closet<br><span id="closet-temp">--.-°F</span></div>
+        <div class="overlay-label label4" id="bedroom-label">Bedroom<br><span id="bedroom-temp">--.-°F</span></div>
+      </div>
+      <button class="refresh-btn" onclick="refreshData()">🔄 Refresh Data</button>
+      <div class="note">
+        Taking a look at the graph, you can see the sawtooth patterns when the air conditioner cycles on and off. In the near future, I will be adding another sensor to indicate when the air conditioner is running, as well as integrating local weather data. The end goal is to understand the temperature gradients in my apartment better, and build an ML model to proactively control the AC.
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h2>About This Project</h2>
+  <h3>Overview</h3>
+  <p>
+    My air conditioner has been acting unpredictably for the past two summers, and living in a top-floor loft produces some large temperature gradients in my apartment in the summer. I was struggling to maintain a stable temperature in my home, and didn't want to run the air conditioner more than I had to, so like any engineer, I knew what I had to do: build a complicated system and figure out what exactly was going on.
+  </p>
+  <p>
+    As depicted, the system is composed of three major components; sensors, a home server, and a web application.
+    The sensors gather temperature and humidity data, send it via MQTT protocol to the server, where an MQTT broker receives the data...
+  </p>
+
+  <!-- External JS at the end for fastest load -->
+  <script src="dashboard.js"></script>
+</body>
+</html>

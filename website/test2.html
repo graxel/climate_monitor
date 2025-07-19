@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Plotly WebSocket Live Test Plot</title>
+  <script src="https://cdn.plot.ly/plotly-2.30.1.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    #plot { width: 100%; max-width: 700px; height: 420px; margin: auto; }
+    #ws-status { margin-bottom: 1em; }
+  </style>
+</head>
+<body>
+  <h1>Plotly WebSocket Live Test Plot</h1>
+  <div id="ws-status">Connecting to websocket...</div>
+  <div id="plot"></div>
+  <script>
+    // Initial data
+    let xData = ['2025-07-19 09:00:00', '2025-07-19 09:00:10', '2025-07-19 09:00:20'];
+    let yData = [27, 26, 25];
+    const layout = {
+      title: 'Test Temperature Plot (office_temp)',
+      xaxis: { title: 'Timestamp', tickformat: "%H:%M %b %d", autorange:true },
+      yaxis: { title: 'Temperature (°C)', autorange:true }
+    };
+
+    // Initial empty plot
+    Plotly.newPlot('plot', [{
+      x: xData,
+      y: yData,
+      mode: 'lines+markers',
+      name: 'office_temp',
+      line: { color: '#1f77b4' }
+    }], layout);
+
+    // --- WebSocket integration ---
+    const wsUrl = "wss://data.kevingrazel.com:6789";
+    const wsStatus = document.getElementById('ws-status');
+
+    let ws;
+    try {
+      ws = new WebSocket(wsUrl);
+    } catch (err) {
+      wsStatus.textContent = "WebSocket error: " + err;
+    }
+
+    ws.onopen = function() {
+      wsStatus.textContent = "🟢 Connected to " + wsUrl;
+    };
+    ws.onclose = function() {
+      wsStatus.textContent = "🔴 Disconnected";
+    };
+    ws.onerror = function() {
+      wsStatus.textContent = "⚠️  WebSocket error";
+    };
+
+    ws.onmessage = function(evt) {
+      let msg;
+      try {
+        msg = JSON.parse(evt.data);
+      } catch (e) {
+        wsStatus.textContent = "[Decode error] " + evt.data;
+        return;
+      }
+
+      // Check data format is as you expect
+      if (
+        !msg.timestamp ||
+        !msg.sensor_data ||
+        typeof msg.sensor_data.office_temp !== "number"
+      ) {
+        wsStatus.textContent = "[Received invalid message] " + evt.data;
+        return;
+      }
+
+      // Add to data arrays & update plot
+      const ts = msg.timestamp;
+      const val = msg.sensor_data.office_temp;
+      xData.push(ts);
+      yData.push(val);
+
+      // Limit points
+    //   const N = 20;
+    //   if (xData.length > N) { xData = xData.slice(-N); yData = yData.slice(-N); }
+
+      // Use Plotly.react to completely redraw
+      Plotly.react('plot', [{
+        x: [...xData],
+        y: [...yData],
+        mode: 'lines+markers',
+        name: 'office_temp',
+        line: { color: '#1f77b4' }
+      }], layout, {responsive: true});
+      wsStatus.textContent = `🟢 Last data: office_temp=${val}, time=${ts}`;
+    };
+  </script>
+</body>
+</html>

@@ -27,7 +27,6 @@ ssl_context.load_cert_chain(
     certfile='/etc/letsencrypt/live/data.kevingrazel.com/fullchain.pem',
     keyfile='/etc/letsencrypt/live/data.kevingrazel.com/privkey.pem'
 )
-# Replace with your actual Let's Encrypt cert/key files.
 
 async def main():
     async with websockets.serve(
