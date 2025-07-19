@@ -33,7 +33,7 @@ async def get_data():
             "humidity": 67
         }
     }
-    return {"data": data}
+    return data
 
 
 if __name__ == "__main__":
