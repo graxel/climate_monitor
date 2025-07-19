@@ -3,7 +3,7 @@ import websockets
 import json
 import ssl
 
-from data_provider import get_data  # import your function
+from ws_data_provider import get_data
 
 CONNECTED = set()
 
