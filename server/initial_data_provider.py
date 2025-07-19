@@ -45,7 +45,7 @@ def initial_data():
         for col in df.columns:
             if col.startswith(data_type_value):
                 col_end = col.partition('__')[2]
-                data = df[col].head().to_list()
+                data = df[col].to_list()
                 if data_type_key in d:
                     d[data_type_key][col_end] = data
                 else:
