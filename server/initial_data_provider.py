@@ -11,7 +11,9 @@ PG_DB = os.getenv("PG_DB")
 PG_USER = os.getenv("PG_USER")
 PG_PASSWORD = os.getenv("PG_PASSWORD")
 
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 def get_db_connection():
     db_url = f"postgresql+psycopg2://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
@@ -51,4 +53,4 @@ def initial_data():
     return jsonify(d)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
