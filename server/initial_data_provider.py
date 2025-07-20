@@ -19,7 +19,11 @@ def get_db_connection():
     db_url = f"postgresql+psycopg2://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
     engine = create_engine(db_url)
     return engine
-    
+
+@app.route("/")
+def hello():
+    return "The data source!"
+
 @app.route("/api/initial_data")
 def initial_data():
 
@@ -53,4 +57,4 @@ def initial_data():
     return jsonify(d)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, ssl_context='adhoc')
+    app.run()#host='0.0.0.0', ssl_context='adhoc')
