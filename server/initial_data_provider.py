@@ -20,6 +20,9 @@ def get_db_connection():
     engine = create_engine(db_url)
     return engine
 
+def json_ready(lst):
+    return [None if pd.isna(x) else x for x in lst]
+
 @app.route("/")
 def hello():
     return "The data source!"
@@ -44,12 +47,12 @@ def initial_data():
         'weather_data': 'weather__'
     }
 
-    d = {'obs_time': df['obs_time'].to_list()}
+    d = {'obs_time': json_ready(df['obs_time'].to_list())}
     for data_type_key, data_type_value in data_types.items():
         for col in df.columns:
             if col.startswith(data_type_value):
                 col_end = col.partition('__')[2]
-                data = df[col].to_list()
+                data = json_ready(df[col].to_list())
                 if data_type_key in d:
                     d[data_type_key][col_end] = data
                 else:
