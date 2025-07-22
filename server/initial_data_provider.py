@@ -49,7 +49,7 @@ def initial_data():
     }
 
     d = {
-        'request_time': dt.now(),
+        'aa_request_time': dt.now(),
         'obs_time': json_ready(df['obs_time'].to_list())
     }
     for data_type_key, data_type_value in data_types.items():
