@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from datetime import datetime as dt
 from sqlalchemy import create_engine
 import os
 from dotenv import load_dotenv
@@ -47,7 +48,10 @@ def initial_data():
         'weather_data': 'weather__'
     }
 
-    d = {'obs_time': json_ready(df['obs_time'].to_list())}
+    d = {
+        'request_time': dt.now(),
+        'obs_time': json_ready(df['obs_time'].to_list())
+    }
     for data_type_key, data_type_value in data_types.items():
         for col in df.columns:
             if col.startswith(data_type_value):
