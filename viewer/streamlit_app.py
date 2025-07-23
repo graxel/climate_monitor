@@ -31,7 +31,7 @@ engine = create_engine(db_url)
 
 query = """
     SELECT *
-    FROM hist_10m
+    FROM webpage_plot_data
     WHERE obs_time >= CURRENT_DATE - INTERVAL '2 days'
     ORDER BY obs_time DESC
     """
@@ -43,36 +43,52 @@ def load_data():
 df = load_data()
 
 # --- Data preprocessing ---
-if 'temp' in df.columns:
-    df['temp_f'] = (df['temp'] * 9 / 5 + 32)
-else:
-    df['temp_f'] = np.nan
+# if 'temp' in df.columns:
+#     df['temp_f'] = (df['temp'] * 9 / 5 + 32)
+# else:
+#     df['temp_f'] = np.nan
 
-legend_order = {
-    'PICO_W_01': 'Office',
-    'PICO_W_02': 'Kitchen',
-    'PICO_W_03': 'Closet',
-    'PICO_W_04': 'Bedroom'
-}
+# legend_order = {
+#     'PICO_W_01': 'Office',
+#     'PICO_W_02': 'Kitchen',
+#     'PICO_W_03': 'Closet',
+#     'PICO_W_04': 'Bedroom'
+# }
 
-df['sensor_loc'] = df['sensor_id'].map(legend_order)
+# df['sensor_loc'] = df['sensor_id'].map(legend_order)
 df['obs_time'] = pd.to_datetime(df['obs_time'])
 timestamps_dt = [dt.to_pydatetime() for dt in df['obs_time'].sort_values().unique()]
 
 
 def make_plot(df, selected_time):
+    # fig = px.line(
+    #     df,
+    #     x='obs_time',
+    #     y='temp_f',
+    #     color='sensor_loc',
+    #     color_discrete_sequence=px.colors.qualitative.D3,
+    #     category_orders={'sensor_loc': legend_order.values()},
+    #     labels={
+    #         "obs_time": "Time",
+    #         "temp_f": "Temperature",
+    #         # "sensor_loc": "Sensor"
+    #     }
+    # )
     fig = px.line(
         df,
         x='obs_time',
-        y='temp_f',
-        color='sensor_loc',
-        color_discrete_sequence=px.colors.qualitative.D3,
-        category_orders={'sensor_loc': legend_order.values()},
+        y=[
+            'sensor__bedroom_temp',
+            'sensor__closet_temp',
+            'sensor__kitchen_temp',
+            'sensor__office_temp'
+        ],
         labels={
-            "obs_time": "Time",
-            "temp_f": "Temperature",
-            # "sensor_loc": "Sensor"
-        }
+            'value': 'Temperature',
+            'obs_time': 'Time',
+            'variable': 'Room'
+        },
+        title='Temperature Readings Over Time by Room'
     )
     fig.update_layout(
         legend_title_text=None,#'Sensor',
