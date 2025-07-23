@@ -201,8 +201,8 @@ with col2:
     # Find overlay values for selected time
     selected_df = df[df['obs_time'] == pd.Timestamp(selected_time)]
     overlay_values = []
-    for sensor in legend_order.values():
-        val = selected_df[selected_df['sensor_loc'] == sensor]['temp_f'].round(1)
+    for sensor in ['sensor__bedroom_temp', 'sensor__closet_temp', 'sensor__kitchen_temp', 'sensor__office_temp']:
+        val = selected_df[sensor].round(1)
         overlay_values.append(str(val.values[0]) + "°F" if not val.empty else "N/A")
     while len(overlay_values) < 5:
         overlay_values.append("N/A")
