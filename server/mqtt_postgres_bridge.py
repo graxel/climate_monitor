@@ -1,4 +1,5 @@
 import os
+import sys
 from dotenv import load_dotenv
 import psycopg2
 from datetime import datetime
@@ -7,6 +8,13 @@ import paho.mqtt.client as mqtt
 
 # Load environment variables from .env file
 load_dotenv()
+
+required_vars = ["PG_HOST", "PG_DB", "PG_USER", "PG_PASSWORD", "MQTT_BROKER", "MQTT_PORT", "MQTT_TOPIC"]
+
+missing = [var for var in required_vars if var not in os.environ]
+if missing:
+    print(f"Missing environment variables: {', '.join(missing)}")
+    sys.exit(1)
 
 # Access variables using os.getenv
 PG_HOST = os.getenv("PG_HOST")
@@ -36,6 +44,9 @@ def on_message(client, userdata, msg):
         # Expecting CSV: sensor_id,timestamp,temp1,hum1,temp2,hum2
         payload = msg.payload.decode()
         parts = payload.strip().split(',')
+        if len(parts) != 6:
+            print(f"Malformed payload ({payload}); expected 6 fields.")
+            sys.exit(1)
         sensor_id = parts[0]
         obs_time = datetime.fromtimestamp(float(parts[1]))
         temp1 = float(parts[2])
@@ -43,20 +54,28 @@ def on_message(client, userdata, msg):
         temp2 = float(parts[4])
         hum2 = float(parts[5])
 
-        # Insert into PostgreSQL
-        cur.execute(
-            """
-            INSERT INTO observations (sensor_id, obs_time, temp1, hum1, temp2, hum2)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            """,
-            (sensor_id, obs_time, temp1, hum1, temp2, hum2)
-        )
-        conn.commit()
+        with psycopg2.connect(
+            host=PG_HOST,
+            dbname=PG_DB,
+            user=PG_USER,
+            password=PG_PASSWORD
+        ) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO observations (sensor_id, obs_time, temp1, hum1, temp2, hum2)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """,
+                    (sensor_id, obs_time, temp1, hum1, temp2, hum2)
+                )
+                conn.commit()
         print(f"Inserted data from {sensor_id} at {obs_time}")
     except Exception as e:
-        print("Error processing message:", e)
+        print(f"Error processing message: {msg}")
+        print(e)
 
-client = mqtt.Client()
+
+client = mqtt.Client(protocol=mqtt.MQTTv311)
 client.on_connect = on_connect
 client.on_message = on_message
 
