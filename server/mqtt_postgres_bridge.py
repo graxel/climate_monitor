@@ -25,19 +25,12 @@ MQTT_BROKER = os.getenv("MQTT_BROKER")
 MQTT_PORT = int(os.getenv("MQTT_PORT"))  # Cast to int if needed
 MQTT_TOPIC = os.getenv("MQTT_TOPIC")
 
-
-# Connect to PostgreSQL
-conn = psycopg2.connect(
-    host=PG_HOST,
-    dbname=PG_DB,
-    user=PG_USER,
-    password=PG_PASSWORD
-)
-cur = conn.cursor()
-
-def on_connect(client, userdata, flags, rc):
-    print("Connected to MQTT broker with result code", rc)
-    client.subscribe(MQTT_TOPIC)
+def on_connect(client, userdata, flags, reason_code, properties):
+    if reason_code == mqtt.CONNACK_ACCEPTED:
+        print("Connected to MQTT broker.")
+        client.subscribe(MQTT_TOPIC)
+    else:
+        print(f"Connection failed with reason code {reason_code}")
 
 def on_message(client, userdata, msg):
     try:
@@ -74,8 +67,7 @@ def on_message(client, userdata, msg):
         print(f"Error processing message: {msg}")
         print(e)
 
-
-client = mqtt.Client(protocol=mqtt.MQTTv311)
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv311)
 client.on_connect = on_connect
 client.on_message = on_message
 
