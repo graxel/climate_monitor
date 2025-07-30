@@ -84,3 +84,29 @@ if not df.empty:
             {"min_interval": min_interval}
         )
         wide.to_sql('webpage_plot_data', conn, if_exists='append', index=False)
+
+        for sensor in sensor_mapping.values():
+            col_temp = f"sensor__{sensor}_temp"
+            col_hum = f"sensor__{sensor}_hum"
+
+            # Select rows where temp or hum for the sensor is not null
+            sensor_rows = wide[wide[[col_temp, col_hum]].notnull().any(axis=1)]
+            if sensor_rows.empty:
+                continue  # No new data for this sensor in this batch
+
+            max_obs_time = sensor_rows['obs_time'].max()
+
+            conn.execute(
+                text("""
+                    INSERT INTO update_status (table_name, sensor_id, last_updated)
+                    VALUES (:table_name, :sensor_id, :last_updated)
+                    ON CONFLICT (table_name, sensor_id)
+                    DO UPDATE SET last_updated = EXCLUDED.last_updated
+                    WHERE update_status.last_updated < EXCLUDED.last_updated
+                """),
+                {
+                    "table_name": "webpage_plot_data",
+                    "sensor_id": sensor,
+                    "last_updated": max_obs_time
+                }
+            )

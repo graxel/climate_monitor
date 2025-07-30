@@ -5,8 +5,6 @@ import psycopg2
 from datetime import datetime
 import paho.mqtt.client as mqtt
 
-
-# Load environment variables from .env file
 load_dotenv()
 
 required_vars = ["PG_HOST", "PG_DB", "PG_USER", "PG_PASSWORD", "MQTT_BROKER", "MQTT_PORT", "MQTT_TOPIC"]
@@ -16,7 +14,6 @@ if missing:
     print(f"Missing environment variables: {', '.join(missing)}")
     sys.exit(1)
 
-# Access variables using os.getenv
 PG_HOST = os.getenv("PG_HOST")
 PG_DB = os.getenv("PG_DB")
 PG_USER = os.getenv("PG_USER")
@@ -60,6 +57,16 @@ def on_message(client, userdata, msg):
                     VALUES (%s, %s, %s, %s, %s, %s)
                     """,
                     (sensor_id, obs_time, temp1, hum1, temp2, hum2)
+                )
+                cur.execute(
+                    """
+                    INSERT INTO update_status (table_name, sensor_id, last_updated)
+                    VALUES ('observations', %s, %s)
+                    ON CONFLICT (table_name, sensor_id)
+                    DO UPDATE SET last_updated = EXCLUDED.last_updated
+                    WHERE update_status.last_updated < EXCLUDED.last_updated
+                    """,
+                    (sensor_id, obs_time)
                 )
                 conn.commit()
         print(f"Inserted data from {sensor_id} at {obs_time}")
