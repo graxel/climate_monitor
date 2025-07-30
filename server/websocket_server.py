@@ -15,7 +15,13 @@ async def broadcast_data():
             await asyncio.gather(*(ws.send(message) for ws in CONNECTED))
         await asyncio.sleep(1)
 
-async def handler(websocket):
+async def handler(websocket, path):
+    print(f"New connection on path: {path}")  # Debug to confirm path is received
+    if path != "/ws/":
+        # Optionally reject connections on unexpected paths
+        await websocket.close(code=1008, reason="Invalid path")
+        return
+
     CONNECTED.add(websocket)
     try:
         await websocket.wait_closed()
@@ -35,7 +41,7 @@ async def main():
         port=6789,
         ssl=ssl_context
     ):
-        print("Secure WebSocket server started on wss://data.kevingrazel.com:6789")
+        print("Secure WebSocket server started on wss://data.kevingrazel.com/ws/")
         await broadcast_data()
 
 if __name__ == "__main__":
