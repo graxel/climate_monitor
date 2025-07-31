@@ -12,9 +12,9 @@ load_dotenv()
 
 CONNECTED = set()
 
-    certfile=CERTFILE,
-    keyfile=KEYFILE
-    
+CERTFILE = os.getenv('CERTFILE')
+KEYFILE = os.getenv('KEYFILE')
+
 async def broadcast_data():
     while True:
         data = await get_data()
