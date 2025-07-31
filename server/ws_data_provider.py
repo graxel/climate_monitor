@@ -2,6 +2,8 @@ import random
 import asyncio
 from datetime import datetime
 
+from sqlalchemy import create_engine
+
 from postgres_auth import db_url
 
 
