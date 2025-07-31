@@ -46,7 +46,7 @@ def query_db():
     return temp_hum
 
 async def get_data():
-    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now_str = datetime.now()#.strftime("%Y-%m-%d %H:%M:%S")
 
     sensor_data = await asyncio.to_thread(query_db)
 
