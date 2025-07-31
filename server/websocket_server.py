@@ -21,8 +21,16 @@ async def broadcast_data():
         data = await get_data()
         message = json.dumps(data)
         if CONNECTED:
-            await asyncio.gather(*(ws.send(message) for ws in CONNECTED))
+            to_remove = set()
+            for ws in CONNECTED:
+                try:
+                    await ws.send(message)
+                except websockets.exceptions.ConnectionClosed:
+                    to_remove.add(ws)
+            for ws in to_remove:
+                CONNECTED.remove(ws)
         await asyncio.sleep(5)
+
 
 async def handler(websocket):
     CONNECTED.add(websocket)
@@ -45,7 +53,9 @@ async def main():
         ssl=ssl_context
     ):
         print("Secure WebSocket server started")
-        await broadcast_data()
+        broadcaster_task = asyncio.create_task(broadcast_data())
+        await server.wait_closed()
+        broadcaster_task.cancel()
 
 if __name__ == "__main__":
     asyncio.run(main())
