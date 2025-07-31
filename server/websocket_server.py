@@ -46,16 +46,16 @@ ssl_context.load_cert_chain(
 )
 
 async def main():
-    async with websockets.serve(
+    server = await websockets.serve(
         handler,
         host="0.0.0.0",
         port=6789,
         ssl=ssl_context
-    ):
-        print("Secure WebSocket server started")
-        broadcaster_task = asyncio.create_task(broadcast_data())
-        await server.wait_closed()
-        broadcaster_task.cancel()
+    )
+    print("Secure WebSocket server started")
+    broadcaster_task = asyncio.create_task(broadcast_data())
+    await server.wait_closed()
+    broadcaster_task.cancel()
 
 if __name__ == "__main__":
     asyncio.run(main())
