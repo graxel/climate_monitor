@@ -3,7 +3,7 @@ import asyncio
 from datetime import datetime
 
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 from postgres_auth import db_url
 
