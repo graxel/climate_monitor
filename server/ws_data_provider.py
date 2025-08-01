@@ -17,7 +17,7 @@ SENSOR_MAPPING = {
     'PICO_W_04': 'bedroom',
 }
 
-def query_db():
+def query_observations():
     with engine.connect() as conn:
         # Grab most recent observation per sensor_id
         query = """
@@ -45,10 +45,38 @@ def query_db():
 
     return temp_hum
 
+
+def query_updates():
+    with engine.connect() as conn:
+        # Grab most recent update times
+        query = """
+            SELECT *
+            FROM update_status
+            ORDER BY table_name ASC, sensor_id ASC
+        """
+        df = pd.read_sql_query(text(query), conn)
+
+    if df.empty:
+        return {}
+
+    update_times = {}
+
+    # Group rows by 'table_name'
+    grouped = df.groupby("table_name")
+
+    for table_name, group in grouped:
+        # Create a dict of sensor_id -> last_updated for each group
+        updates = dict(zip(group["sensor_id"], group["last_updated"].astype(str)))
+        update_times[table_name] = updates
+
+    return update_times
+    
+
 async def get_data():
     now_str = datetime.now().isoformat()
 
-    sensor_data = await asyncio.to_thread(query_db)
+    sensor_data = await asyncio.to_thread(query_observations)
+    update_times = await asyncio.to_thread(query_updates)
 
     data = {
         "timestamp": now_str,
@@ -73,7 +101,8 @@ async def get_data():
             "cloud_cover": 30,
             "temperature": 87,
             "humidity": 67
-        }
+        },
+        "update_times": **update_times
     }
     return data
 
