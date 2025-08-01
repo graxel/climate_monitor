@@ -70,7 +70,7 @@ def query_updates():
         update_times[table_name] = updates
 
     return update_times
-    
+
 
 async def get_data():
     now_str = datetime.now().isoformat()
@@ -102,7 +102,7 @@ async def get_data():
             "temperature": 87,
             "humidity": 67
         },
-        "update_times": **update_times
+        "update_times": update_times
     }
     return data
 
