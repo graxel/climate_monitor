@@ -1,24 +1,21 @@
 import os
+
 import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
+
+from postgres_auth import db_url
+
+
 load_dotenv()
 
-PG_HOST = os.getenv('PG_HOST')
-PG_PORT = os.getenv('PG_PORT')
-PG_DB = os.getenv('PG_DB')
-PG_USER = os.getenv('PG_USER')
-PG_PASSWORD = os.getenv('PG_PASSWORD')
 
-db_url = f"postgresql+psycopg2://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
 engine = create_engine(db_url)
 
-# 1. Find latest aggregated interval
 with engine.connect() as conn:
     result = conn.execute(text("SELECT MAX(obs_time) FROM webpage_plot_data"))
     latest_history = result.scalar()
 
-# 2. Query new data from raw table
 lower_bound = latest_history if latest_history else '1970-01-01'
 
 query = f"""
