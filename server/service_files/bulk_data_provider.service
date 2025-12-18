@@ -1,5 +1,5 @@
 [Unit]
-Description=Historical data provider service for climate monitor website
+Description=Bulk data provider service for apartment climate monitor
 After=network.target
 
 [Service]
@@ -7,7 +7,7 @@ Type=simple
 User=__USERNAME__
 EnvironmentFile=/home/__USERNAME__/climate_monitor/server/.env
 WorkingDirectory=/home/__USERNAME__/climate_monitor/server
-ExecStart=/home/__USERNAME__/.local/bin/poetry run gunicorn initial_data_provider:app --bind 127.0.0.1:8000
+ExecStart=/home/__USERNAME__/.local/bin/poetry run gunicorn bulk_data_provider:app --bind 127.0.0.1:8000
 Restart=always
 
 [Install]

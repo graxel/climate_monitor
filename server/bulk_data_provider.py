@@ -1,0 +1,81 @@
+import os
+from datetime import datetime as dt
+
+from dotenv import load_dotenv
+import pandas as pd
+from sqlalchemy import create_engine
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+
+from postgres_auth import db_url
+
+load_dotenv()
+
+app = Flask(__name__)
+CORS(app)
+
+
+def json_ready(lst):
+    return [None if pd.isna(x) else x for x in lst]
+
+@app.route("/")
+def hello():
+    return "The data source!"
+
+@app.route("/api/initial_data")
+def initial_data():
+
+    engine = create_engine(db_url)
+
+    query = """
+        SELECT *
+        FROM webpage_plot_data
+        WHERE obs_time >= CURRENT_DATE - INTERVAL '2 days'
+        """
+
+    df = pd.read_sql_query(query, engine).sort_values('obs_time', ascending=True)
+
+    data_types = {
+        'sensor_data': 'sensor__',
+        'home_data': 'home__',
+        'weather_data': 'weather__'
+    }
+
+    d = {
+        'aa_request_time': dt.now(),
+        'obs_time': json_ready(df['obs_time'].apply(lambda x: x.isoformat()).to_list())
+    }
+    for data_type_key, data_type_value in data_types.items():
+        for col in df.columns:
+            if col.startswith(data_type_value):
+                col_end = col.partition('__')[2]
+                data = json_ready(df[col].to_list())
+                if data_type_key in d:
+                    d[data_type_key][col_end] = data
+                else:
+                    d[data_type_key] = {col_end: data}
+    return jsonify(d)
+
+@app.route("/api/databricks/observations")
+def brix_obs():
+    engine = create_engine(db_url)
+
+    # Read ?since_id=... from query string; default to 0 if missing
+    since_id = request.args.get("since_id", default=0, type=int)
+
+    query = """
+        SELECT *
+        FROM observations
+        WHERE obs_id > %(since_id)s
+        ORDER BY obs_id
+        LIMIT 100000
+    """
+
+    df = pd.read_sql_query(query, engine, params={"since_id": since_id})
+
+    # Return array of row dicts for easy ingestion in Databricks
+    records = df.to_dict(orient="records")
+    return jsonify(records)
+
+if __name__ == "__main__":
+    app.run()

@@ -4,13 +4,13 @@ import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 
-from postgres_auth import db_url
+from postgres_auth import db_writer_url
 
 
 load_dotenv()
 
 
-engine = create_engine(db_url)
+engine = create_engine(db_writer_url)
 
 with engine.connect() as conn:
     result = conn.execute(text("SELECT MAX(obs_time) FROM webpage_plot_data"))

@@ -7,7 +7,7 @@ import paho.mqtt.client as mqtt
 
 load_dotenv()
 
-required_vars = ["PG_HOST", "PG_DB", "PG_USER", "PG_PASSWORD", "MQTT_BROKER", "MQTT_PORT", "MQTT_TOPIC"]
+required_vars = ["PG_HOST", "PG_DB", "PG_USER", "PG_PASSWORD", "PG_WRITE_USER", "PG_WRITE_PASSWORD", "MQTT_BROKER", "MQTT_PORT", "MQTT_TOPIC"]
 
 missing = [var for var in required_vars if var not in os.environ]
 if missing:
@@ -16,8 +16,8 @@ if missing:
 
 PG_HOST = os.getenv("PG_HOST")
 PG_DB = os.getenv("PG_DB")
-PG_USER = os.getenv("PG_USER")
-PG_PASSWORD = os.getenv("PG_PASSWORD")
+PG_USER = os.getenv("PG_WRITE_USER")
+PG_PASSWORD = os.getenv("PG_WRITE_PASSWORD")
 MQTT_BROKER = os.getenv("MQTT_BROKER")
 MQTT_PORT = int(os.getenv("MQTT_PORT"))  # Cast to int if needed
 MQTT_TOPIC = os.getenv("MQTT_TOPIC")
