@@ -5,9 +5,9 @@ After=network.target
 [Service]
 Type=simple
 User=__USERNAME__
-EnvironmentFile=/home/__USERNAME__/climate_monitor/server/.env
-WorkingDirectory=/home/__USERNAME__/climate_monitor/server
-ExecStart=/home/__USERNAME__/.local/bin/poetry run gunicorn bulk_data_provider:app --bind 127.0.0.1:8000
+EnvironmentFile=__SERVER_DIR__/.env
+WorkingDirectory=__SERVER_DIR__
+ExecStart=__SERVER_DIR__/.venv/bin/gunicorn bulk_data_provider:app --bind 127.0.0.1:8000
 Restart=always
 
 [Install]

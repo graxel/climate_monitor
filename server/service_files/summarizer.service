@@ -4,6 +4,6 @@ Description=Prepare data for webpage
 [Service]
 Type=oneshot
 User=__USERNAME__
-EnvironmentFile=/home/__USERNAME__/climate_monitor/server/.env
-WorkingDirectory=/home/__USERNAME__/climate_monitor/server
-ExecStart=/home/__USERNAME__/.local/bin/poetry run python summarizer.py
+EnvironmentFile=__SERVER_DIR__/.env
+WorkingDirectory=__SERVER_DIR__
+ExecStart=__SERVER_DIR__/.venv/bin/python summarizer.py
