@@ -10,7 +10,7 @@ BOARD="raspberry_pi_pico_w"
 VERSION=$(curl -s https://api.github.com/repos/adafruit/circuitpython/releases/latest | jq -r '.tag_name')
 
 # Download the UF2 file for Raspberry Pi Pico
-echo "Downloading CircuitPython version ${VERSION} for Raspberry Pi Pico..."
+echo "Downloading CircuitPython version ${VERSION} for ${BOARD}..."
 curl -L -f -o circuitpython-pico.uf2 \
   "https://downloads.circuitpython.org/bin/${BOARD}/en_US/adafruit-circuitpython-${BOARD}-en_US-${VERSION}.uf2"
 
