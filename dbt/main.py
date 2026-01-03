@@ -1,5 +1,5 @@
 def main():
-    print("Hello from databricks-dbt!")
+    print("Hello from dbt!")
 
 
 if __name__ == "__main__":

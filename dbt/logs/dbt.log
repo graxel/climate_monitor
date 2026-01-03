@@ -1,0 +1,121 @@
+[0m15:29:10.083362 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x111072e40>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x11304bb90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x11304b860>]}
+
+
+============================== 15:29:10.105018 | 4693822f-bec5-4e17-81be-e1a1bc4299a8 ==============================
+[0m15:29:10.105018 [info ] [MainThread]: Running with dbt=1.10.16
+[0m15:29:10.105366 [debug] [MainThread]: running dbt with arguments {'log_format': 'default', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'indirect_selection': 'eager', 'log_path': 'logs', 'send_anonymous_usage_stats': 'True', 'profiles_dir': '/Users/graxel/.dbt', 'warn_error': 'None', 'version_check': 'True', 'cache_selected_only': 'False', 'write_json': 'True', 'fail_fast': 'False', 'empty': 'None', 'target_path': 'None', 'partial_parse': 'True', 'log_cache_events': 'False', 'quiet': 'False', 'no_print': 'None', 'printer_width': '80', 'use_colors': 'True', 'use_experimental_parser': 'False', 'static_parser': 'True', 'debug': 'False', 'introspect': 'True', 'invocation_command': 'dbt init'}
+[0m15:29:19.358303 [debug] [MainThread]: Starter project path: /Users/graxel/repos/climate_monitor/dbt/.venv/lib/python3.12/site-packages/dbt/include/starter_project
+[0m15:29:19.369127 [info ] [MainThread]: 
+Your new dbt project "databricks" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m15:29:19.369709 [info ] [MainThread]: Setting up your profile.
+[0m15:29:35.284034 [debug] [MainThread]: Spark adapter: Setting pyhive.hive logging to ERROR
+[0m15:29:35.284498 [debug] [MainThread]: Spark adapter: Setting thrift.transport logging to ERROR
+[0m15:29:35.284663 [debug] [MainThread]: Spark adapter: Setting thrift.protocol logging to ERROR
+[0m15:30:57.299063 [info ] [MainThread]: Profile databricks written to /Users/graxel/.dbt/profiles.yml using target's profile_template.yml and your supplied values. Run 'dbt debug' to validate the connection.
+[0m15:30:57.305269 [debug] [MainThread]: Resource report: {"command_name": "init", "command_success": true, "command_wall_clock_time": 107.12244, "process_in_blocks": "0", "process_kernel_time": 0.870707, "process_mem_max_rss": "291602432", "process_out_blocks": "0", "process_user_time": 3.723468}
+[0m15:30:57.310227 [debug] [MainThread]: Command `dbt init` succeeded at 15:30:57.309723 after 107.13 seconds
+[0m15:30:57.317469 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x112ea2b10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1336d4140>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1331841a0>]}
+[0m15:30:57.319029 [debug] [MainThread]: Flushing usage events
+[0m15:30:57.539539 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:31:19.891348 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x10416aed0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1046577d0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1057153a0>]}
+
+
+============================== 15:31:19.895762 | c16322e7-486e-48e1-aeff-a1e92d183343 ==============================
+[0m15:31:19.895762 [info ] [MainThread]: Running with dbt=1.10.16
+[0m15:31:19.896236 [debug] [MainThread]: running dbt with arguments {'debug': 'False', 'static_parser': 'True', 'introspect': 'True', 'log_format': 'default', 'target_path': 'None', 'use_colors': 'True', 'cache_selected_only': 'False', 'printer_width': '80', 'empty': 'None', 'profiles_dir': '/Users/graxel/.dbt', 'fail_fast': 'False', 'indirect_selection': 'eager', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'quiet': 'False', 'no_print': 'None', 'version_check': 'True', 'write_json': 'True', 'log_cache_events': 'False', 'warn_error': 'None', 'invocation_command': 'dbt debug', 'use_experimental_parser': 'False', 'log_path': 'logs', 'partial_parse': 'True', 'send_anonymous_usage_stats': 'True'}
+[0m15:31:19.912616 [info ] [MainThread]: dbt version: 1.10.16
+[0m15:31:19.912951 [info ] [MainThread]: python version: 3.12.12
+[0m15:31:19.913150 [info ] [MainThread]: python path: /Users/graxel/repos/climate_monitor/dbt/.venv/bin/python3
+[0m15:31:19.913298 [info ] [MainThread]: os info: macOS-15.5-arm64-arm-64bit
+[0m15:31:20.376938 [debug] [MainThread]: Spark adapter: Setting pyhive.hive logging to ERROR
+[0m15:31:20.377232 [debug] [MainThread]: Spark adapter: Setting thrift.transport logging to ERROR
+[0m15:31:20.377392 [debug] [MainThread]: Spark adapter: Setting thrift.protocol logging to ERROR
+[0m15:31:20.996648 [info ] [MainThread]: Error importing adapter: No module named 'dbt.adapters.postgres'
+[0m15:31:20.997091 [info ] [MainThread]: Using profiles dir at /Users/graxel/.dbt
+[0m15:31:20.997294 [info ] [MainThread]: Using profiles.yml file at /Users/graxel/.dbt/profiles.yml
+[0m15:31:20.997439 [info ] [MainThread]: Using dbt_project.yml file at /Users/graxel/repos/climate_monitor/dbt/dbt_project.yml
+[0m15:31:20.997579 [info ] [MainThread]: Configuration:
+[0m15:31:20.997710 [info ] [MainThread]:   profiles.yml file [[31mERROR invalid[0m]
+[0m15:31:20.997835 [info ] [MainThread]:   dbt_project.yml file [[31mERROR not found[0m]
+[0m15:31:20.997957 [info ] [MainThread]: Required dependencies:
+[0m15:31:20.998139 [debug] [MainThread]: Executing "git --help"
+[0m15:31:21.016189 [debug] [MainThread]: STDOUT: "b"usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]\n           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]\n           [--super-prefix=<path>] [--config-env=<name>=<envvar>]\n           <command> [<args>]\n\nThese are common Git commands used in various situations:\n\nstart a working area (see also: git help tutorial)\n   clone     Clone a repository into a new directory\n   init      Create an empty Git repository or reinitialize an existing one\n\nwork on the current change (see also: git help everyday)\n   add       Add file contents to the index\n   mv        Move or rename a file, a directory, or a symlink\n   restore   Restore working tree files\n   rm        Remove files from the working tree and from the index\n\nexamine the history and state (see also: git help revisions)\n   bisect    Use binary search to find the commit that introduced a bug\n   diff      Show changes between commits, commit and working tree, etc\n   grep      Print lines matching a pattern\n   log       Show commit logs\n   show      Show various types of objects\n   status    Show the working tree status\n\ngrow, mark and tweak your common history\n   branch    List, create, or delete branches\n   commit    Record changes to the repository\n   merge     Join two or more development histories together\n   rebase    Reapply commits on top of another base tip\n   reset     Reset current HEAD to the specified state\n   switch    Switch branches\n   tag       Create, list, delete or verify a tag object signed with GPG\n\ncollaborate (see also: git help workflows)\n   fetch     Download objects and refs from another repository\n   pull      Fetch from and integrate with another repository or a local branch\n   push      Update remote refs along with associated objects\n\n'git help -a' and 'git help -g' list available subcommands and some\nconcept guides. See 'git help <command>' or 'git help <concept>'\nto read about a specific subcommand or concept.\nSee 'git help git' for an overview of the system.\n""
+[0m15:31:21.016900 [debug] [MainThread]: STDERR: "b''"
+[0m15:31:21.017254 [info ] [MainThread]:  - git [[32mOK found[0m]
+
+[0m15:31:21.017517 [info ] [MainThread]: Connection test skipped since no profile was found
+[0m15:31:21.017768 [info ] [MainThread]: [31m2 checks failed:[0m
+[0m15:31:21.017964 [info ] [MainThread]: Could not load dbt_project.yml
+Profile loading failed for the following reason:
+Runtime Error
+  Credentials in profile "greenhouse_monitor", target "dev" invalid: Runtime Error
+    Could not find adapter type postgres!
+
+
+[0m15:31:21.018656 [info ] [MainThread]: Project loading failed for the following reason:
+ project path </Users/graxel/repos/climate_monitor/dbt/dbt_project.yml> not found
+
+[0m15:31:21.020327 [debug] [MainThread]: Resource report: {"command_name": "debug", "command_success": false, "command_wall_clock_time": 1.1701883, "process_in_blocks": "0", "process_kernel_time": 0.274099, "process_mem_max_rss": "215449600", "process_out_blocks": "0", "process_user_time": 1.402385}
+[0m15:31:21.021618 [debug] [MainThread]: Command `dbt debug` failed at 15:31:21.021476 after 1.17 seconds
+[0m15:31:21.022125 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x104ffaff0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x116337770>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x117dc0f80>]}
+[0m15:31:21.022417 [debug] [MainThread]: Flushing usage events
+[0m15:31:21.173151 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:32:34.409768 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1090efd10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x108f2ffb0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1095858b0>]}
+
+
+============================== 15:32:34.412848 | 07403300-035d-49cf-81f3-376e921a5c12 ==============================
+[0m15:32:34.412848 [info ] [MainThread]: Running with dbt=1.10.16
+[0m15:32:34.413201 [debug] [MainThread]: running dbt with arguments {'target_path': 'None', 'write_json': 'True', 'use_colors': 'True', 'no_print': 'None', 'printer_width': '80', 'version_check': 'True', 'fail_fast': 'False', 'send_anonymous_usage_stats': 'True', 'cache_selected_only': 'False', 'empty': 'None', 'invocation_command': 'dbt debug', 'introspect': 'True', 'partial_parse': 'True', 'profiles_dir': '/Users/graxel/.dbt', 'log_format': 'default', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'quiet': 'False', 'log_path': 'logs', 'static_parser': 'True', 'debug': 'False', 'use_experimental_parser': 'False', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'warn_error': 'None'}
+[0m15:32:34.424339 [info ] [MainThread]: dbt version: 1.10.16
+[0m15:32:34.424603 [info ] [MainThread]: python version: 3.12.12
+[0m15:32:34.424888 [info ] [MainThread]: python path: /Users/graxel/repos/climate_monitor/dbt/.venv/bin/python3
+[0m15:32:34.425072 [info ] [MainThread]: os info: macOS-15.5-arm64-arm-64bit
+[0m15:32:34.860571 [debug] [MainThread]: Spark adapter: Setting pyhive.hive logging to ERROR
+[0m15:32:34.860925 [debug] [MainThread]: Spark adapter: Setting thrift.transport logging to ERROR
+[0m15:32:34.861145 [debug] [MainThread]: Spark adapter: Setting thrift.protocol logging to ERROR
+[0m15:32:35.435859 [info ] [MainThread]: Error importing adapter: No module named 'dbt.adapters.postgres'
+[0m15:32:35.436224 [info ] [MainThread]: Using profiles dir at /Users/graxel/.dbt
+[0m15:32:35.436388 [info ] [MainThread]: Using profiles.yml file at /Users/graxel/.dbt/profiles.yml
+[0m15:32:35.436535 [info ] [MainThread]: Using dbt_project.yml file at /Users/graxel/repos/climate_monitor/dbt/dbt_project.yml
+[0m15:32:35.436843 [info ] [MainThread]: Configuration:
+[0m15:32:35.436979 [info ] [MainThread]:   profiles.yml file [[31mERROR invalid[0m]
+[0m15:32:35.437109 [info ] [MainThread]:   dbt_project.yml file [[31mERROR invalid[0m]
+[0m15:32:35.437232 [info ] [MainThread]: Required dependencies:
+[0m15:32:35.437396 [debug] [MainThread]: Executing "git --help"
+[0m15:32:35.452271 [debug] [MainThread]: STDOUT: "b"usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]\n           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]\n           [--super-prefix=<path>] [--config-env=<name>=<envvar>]\n           <command> [<args>]\n\nThese are common Git commands used in various situations:\n\nstart a working area (see also: git help tutorial)\n   clone     Clone a repository into a new directory\n   init      Create an empty Git repository or reinitialize an existing one\n\nwork on the current change (see also: git help everyday)\n   add       Add file contents to the index\n   mv        Move or rename a file, a directory, or a symlink\n   restore   Restore working tree files\n   rm        Remove files from the working tree and from the index\n\nexamine the history and state (see also: git help revisions)\n   bisect    Use binary search to find the commit that introduced a bug\n   diff      Show changes between commits, commit and working tree, etc\n   grep      Print lines matching a pattern\n   log       Show commit logs\n   show      Show various types of objects\n   status    Show the working tree status\n\ngrow, mark and tweak your common history\n   branch    List, create, or delete branches\n   commit    Record changes to the repository\n   merge     Join two or more development histories together\n   rebase    Reapply commits on top of another base tip\n   reset     Reset current HEAD to the specified state\n   switch    Switch branches\n   tag       Create, list, delete or verify a tag object signed with GPG\n\ncollaborate (see also: git help workflows)\n   fetch     Download objects and refs from another repository\n   pull      Fetch from and integrate with another repository or a local branch\n   push      Update remote refs along with associated objects\n\n'git help -a' and 'git help -g' list available subcommands and some\nconcept guides. See 'git help <command>' or 'git help <concept>'\nto read about a specific subcommand or concept.\nSee 'git help git' for an overview of the system.\n""
+[0m15:32:35.452885 [debug] [MainThread]: STDERR: "b''"
+[0m15:32:35.453120 [info ] [MainThread]:  - git [[32mOK found[0m]
+
+[0m15:32:35.453304 [info ] [MainThread]: Connection test skipped since no profile was found
+[0m15:32:35.453541 [info ] [MainThread]: [31m2 checks failed:[0m
+[0m15:32:35.453683 [info ] [MainThread]: Could not load dbt_project.yml
+Profile loading failed for the following reason:
+Runtime Error
+  Credentials in profile "greenhouse_monitor", target "dev" invalid: Runtime Error
+    Could not find adapter type postgres!
+
+
+[0m15:32:35.453829 [info ] [MainThread]: Project loading failed for the following reason:
+Runtime Error
+  dbt_project.yml does not parse to a dictionary
+
+
+[0m15:32:35.454321 [debug] [MainThread]: Resource report: {"command_name": "debug", "command_success": false, "command_wall_clock_time": 1.0817989, "process_in_blocks": "0", "process_kernel_time": 0.242827, "process_mem_max_rss": "213909504", "process_out_blocks": "0", "process_user_time": 1.310817}
+[0m15:32:35.455033 [debug] [MainThread]: Command `dbt debug` failed at 15:32:35.454936 after 1.08 seconds
+[0m15:32:35.455343 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x108216870>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x111bc4890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x10b1d7b00>]}
+[0m15:32:35.455611 [debug] [MainThread]: Flushing usage events
+[0m15:32:35.812433 [debug] [MainThread]: An error was encountered while trying to flush usage events
