@@ -1,0 +1,6 @@
+CIRCUITPY_WIFI_SSID = "Who-is-John-Galt"
+CIRCUITPY_WIFI_PASSWORD = "AskSargam"
+MQTT_BROKER_ADDRESS = "192.168.0.88"
+MQTT_PORT = "1883"
+MQTT_TOPIC = "sensor/temperature_humidity"
+SENSOR_ID = "PICO_W_00"
