@@ -34,8 +34,8 @@ FORMAT_REF = {
 DATA_TYPES = {
     't': float,
     'h': float,
-    'c': float,
-    'a': float,
+    'c': int,
+    'a': int,
     'w': int,
     'd': int,
 }
