@@ -1,5 +1,5 @@
 from networking import set_up_wifi, set_rtc_from_net
-from sensors import set_up_sensors, read_sensors, set_up_switch
+from sensors import set_up_sensors, read_sensors
 from mqtt_manager import MqttManager
 import time
 from logger import log
@@ -20,14 +20,13 @@ mqtt = MqttManager(radio)
 while True:
     try:
         microcontroller.watchdog.feed()
-        mqtt.loop()
 
         temp1, hum1, temp2, hum2, co2, aqi = read_sensors(sensor1, sensor2, sensor3)
         timestamp = time.mktime(time.localtime())
         payload = ','.join([
             "ththca",
-            mqtt.sensor_id,
-            timestamp,
+            str(mqtt.sensor_id),
+            str(timestamp),
             f"{temp1:.2f}",
             f"{hum1:.2f}",
             f"{temp2:.2f}",
@@ -36,7 +35,7 @@ while True:
             f"{aqi:.2f}"
         ])
         log(f"Publishing: {payload}")
-        #mqtt.publish(payload)
+        mqtt.publish(payload)
 
         microcontroller.watchdog.feed()
 
@@ -44,4 +43,5 @@ while True:
         log("Exception in main loop:", e)
         mqtt.recover()
 
+    time.sleep(3)
     microcontroller.watchdog.feed()

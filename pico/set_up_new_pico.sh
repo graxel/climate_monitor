@@ -29,5 +29,8 @@ if [[ ! -d "$BOARD_PATH" ]]; then
 fi
 
 # Copy UF2 file to the Pico
-echo "Copying CircuitPython to Pico..."
+echo "Copying CircuitPython to Pico."
 cp "$FILENAME" "$BOARD_PATH/"
+
+#echo "Installing circup.
+# command to instal

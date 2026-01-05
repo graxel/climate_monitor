@@ -13,7 +13,6 @@ I2C1_SCL = board.GP11
 
 def set_up_sensors():
     sensor1 = sensor2 = sensor3 = None
-    i2c0 = i2c1 = None
 
     try:
         i2c0 = busio.I2C(I2C0_SCL, I2C0_SDA)
@@ -33,39 +32,32 @@ def set_up_sensors():
         log(f"I2C1 / Sensor2 (AHT) init failed: {e}")
         sensor2 = None
 
-    return sensor1, sensor2, sensor3, i2c0, i2c1
+    return sensor1, sensor2, sensor3
 
 
-def read_sensors(sensor1, sensor2, sensor3, i2c0, i2c1):
+def read_sensors(sensor1, sensor2, sensor3):
     temp1 = hum1 = temp2 = hum2 = None
     co2 = aqi = None
 
-    if sensor1 and i2c0:
+    if sensor1:
         try:
-            if i2c0.try_lock():
-                temp1 = sensor1.temperature
-                hum1 = sensor1.relative_humidity
-                i2c0.unlock()
+            temp1 = sensor1.temperature
+            hum1 = sensor1.relative_humidity
         except Exception as e:
             log(f"Sensor1 (AHT) read error: {e}")
 
-    if sensor2 and i2c1:
+    if sensor2:
         try:
-            if i2c1.try_lock():
-                temp2 = sensor2.temperature
-                hum2 = sensor2.relative_humidity
-                i2c1.unlock()
+            temp2 = sensor2.temperature
+            hum2 = sensor2.relative_humidity
         except Exception as e:
             log(f"Sensor2 (AHT) read error: {e}")
 
-    if sensor3 and i2c0:
+    if sensor3:
         try:
-            if i2c0.try_lock():
-                co2 = sensor3.eCO2
-                aqi = sensor3.AQI
-                i2c0.unlock()
+            co2 = sensor3.eCO2
+            aqi = sensor3.AQI
         except Exception as e:
             log(f"Sensor3 (ENS160) read error: {e}")
 
     return temp1, hum1, temp2, hum2, co2, aqi
-

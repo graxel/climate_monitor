@@ -6,8 +6,7 @@
 set -euo pipefail
 
 BOARD_PATH="/Volumes/CIRCUITPY"
-SETTINGS_FILE="settings.toml"
-REQS_FILE="requirements-circuitpython.txt"
+SETTINGS_FILE="common/settings.toml"
 
 # Check if Pico is connected
 if [[ ! -d "$BOARD_PATH" ]]; then
@@ -21,30 +20,36 @@ if [[ ! -f "$SETTINGS_FILE" ]]; then
   exit 1
 fi
 
+# Ask user to select a device variant
+read -rp "Select a device variant: (a/b) " VARIANT_LETTER
+
+VARIANT="variant_$VARIANT_LETTER"
+REQS_FILE="$VARIANT/requirements-circuitpython.txt"
+
 # Check if requirements-circuitpython.txt exists
 if [[ ! -f "$REQS_FILE" ]]; then
-  echo "Error: requirements-circuitpython.txt does not exist."
+  echo "Error: $VARIANT/requirements-circuitpython.txt not found."
   exit 1
 fi
 
 # Make sure there are python files to copy
-ls *.py >/dev/null 2>&1 || { echo "Error: No .py files found."; exit 1; }
+ls "$VARIANT"/*.py >/dev/null 2>&1 || { echo "Error: No .py files found in $VARIANT/."; exit 1; }
 
 # Read current SENSOR_ID from settings.toml
-CURRENT_ID=$(cut -d'=' -f2 <<< "$(grep -i "SENSOR_ID" settings.toml 2>/dev/null)" | xargs || echo "none")
+CURRENT_ID=$(cut -d'=' -f2 <<< "$(grep -i "SENSOR_ID" "$SETTINGS_FILE" 2>/dev/null)" | xargs || echo "none")
 read -rp "Enter SENSOR_ID: [$CURRENT_ID] " NEW_ID
 
 # Update or add SENSOR_ID in settings.toml
 [[ "$NEW_ID" != "$CURRENT_ID" && -n "$NEW_ID" ]] && \
-  sed -i '' "/SENSOR_ID/d" settings.toml && echo "SENSOR_ID = \"$NEW_ID\"" >> settings.toml
+  sed -i '' "/SENSOR_ID/d" "$SETTINGS_FILE" && echo "SENSOR_ID = \"$NEW_ID\"" >> "$SETTINGS_FILE"
 
 # Copy files to Pico
 echo "=== Copying code files ==="
-cp *.py settings.toml "$BOARD_PATH/"
+cp "$VARIANT"/* common/* "$BOARD_PATH/"
 
 # Install libraries on Pico
 echo "=== Installing libraries ==="
-circup --path "$BOARD_PATH" install -r requirements-circuitpython.txt
+circup --path "$BOARD_PATH" install -r "$REQS_FILE"
 
 # Update libraries on Pico
 echo "=== Updating libraries ==="
