@@ -1,0 +1,7 @@
+adafruit_ahtx0
+adafruit-circuitpython-ens160
+adafruit_minimqtt
+adafruit_requests
+adafruit_datetime
+adafruit_io
+adafruit_bus_device
