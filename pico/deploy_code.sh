@@ -21,7 +21,7 @@ if [[ ! -f "$SETTINGS_FILE" ]]; then
 fi
 
 # Ask user to select a device variant
-read -rp "Select a device variant: (a/b) " VARIANT_LETTER
+read -rp "Select a device variant: (a/b/c/d/e) " VARIANT_LETTER
 
 VARIANT="variant_$VARIANT_LETTER"
 REQS_FILE="$VARIANT/requirements-circuitpython.txt"
