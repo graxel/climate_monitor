@@ -31,18 +31,18 @@ class MqttManager:
                 log("MQTT connect failed, retrying in 5 seconds:", e)
                 time.sleep(5)
 
-    def loop(self):
-        self.client.loop()
-
     def publish(self, msg):
-        self.client.publish(self.topic, msg)
+        try:
+            self.client.publish(self.topic, msg)
+        except Exception as e:
+            log(f"Publish failed: {e}")
     
     def recover(self):
         import time
         try:
             self.client.reconnect()
-            log("MQTT quick reconnect successful.")
+            log("MQTT reconnected.")
         except Exception as e:
-            log("Reconnect failed. Will retry after 5 seconds:", e)
+            log("Reconnect failed:", e)
             time.sleep(5)
             self._connect_forever()

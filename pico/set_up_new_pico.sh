@@ -5,13 +5,14 @@ set -euo pipefail
 
 BOARD_PATH="/Volumes/RPI-RP2"
 BOARD="raspberry_pi_pico_w"
+FILENAME="circuitpython-pico-w.uf2"
 
 # Get the latest CircuitPython version number
 VERSION=$(curl -s https://api.github.com/repos/adafruit/circuitpython/releases/latest | jq -r '.tag_name')
 
 # Download the UF2 file for Raspberry Pi Pico
 echo "Downloading CircuitPython version ${VERSION} for ${BOARD}..."
-curl -L -f -o circuitpython-pico.uf2 \
+curl -L -f -o "$FILENAME" \
   "https://downloads.circuitpython.org/bin/${BOARD}/en_US/adafruit-circuitpython-${BOARD}-en_US-${VERSION}.uf2"
 
 # Check if Pico is in bootloader mode
@@ -28,5 +29,8 @@ if [[ ! -d "$BOARD_PATH" ]]; then
 fi
 
 # Copy UF2 file to the Pico
-echo "Copying CircuitPython to Pico..."
-cp circuitpython-pico.uf2 "$BOARD_PATH/"
+echo "Copying CircuitPython to Pico."
+cp "$FILENAME" "$BOARD_PATH/"
+
+#echo "Installing circup.
+# command to instal
