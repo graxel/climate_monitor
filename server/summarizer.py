@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, inspect
 
 from postgres_auth import db_writer_url
 
@@ -83,6 +83,17 @@ if not df.empty:
 
     # 4. Delete overlapping intervals in webpage_plot_data and insert new aggregates
     with engine.begin() as conn:
+
+        # Check for and add any missing columns
+        inspector = inspect(engine)
+        existing_cols = {col['name'] for col in inspector.get_columns('webpage_plot_data')}
+        df_cols = set(wide.columns) - {'obs_time'}
+        missing_cols = df_cols - existing_cols
+        for col in missing_cols:
+            pg_type = 'numeric'
+            conn.execute(text(f'ALTER TABLE webpage_plot_data ADD COLUMN IF NOT EXISTS "{col}" {pg_type}'))
+        
+        # Clean up ...something. Have to try and remember what this does
         min_interval = wide['obs_time'].min()
         conn.execute(
             text("""
