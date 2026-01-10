@@ -10,8 +10,10 @@ echo ""
 sudo apt update && sudo apt upgrade -y
 
 # install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-export PATH="$HOME/.local/bin:$PATH"
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    export PATH="$HOME/.local/bin:$PATH"
+fi
 
 # build uv environment
 uv python install 3.13
@@ -19,7 +21,7 @@ cd "$SERVER_DIR"
 uv sync
 
 # install, enable, start mosquitto
-sudo apt install mosquitto mosquitto-clients -y
+sudo apt install mosquitto mosquitto-clients -y || true
 sudo systemctl enable mosquitto
 sudo systemctl start mosquitto
 
@@ -31,13 +33,17 @@ sed "$SED_SUBS" "$SERVER_DIR/service_files/bulk_data_provider.service" | sudo te
 sed "$SED_SUBS" "$SERVER_DIR/service_files/websocket_server.service" | sudo tee /etc/systemd/system/climate_monitor_websocket_server.service > /dev/null
 sudo cp service_files/summarizer.timer /etc/systemd/system/climate_monitor_summarizer.timer
 
-# enable and start services
-sudo systemctl daemon-reload
-sudo systemctl enable climate_monitor_mqtt_postgres_bridge.service
-sudo systemctl start climate_monitor_mqtt_postgres_bridge.service
-sudo systemctl enable climate_monitor_summarizer.timer
-sudo systemctl start climate_monitor_summarizer.timer
-sudo systemctl enable climate_monitor_bulk_data_provider.service
-sudo systemctl start climate_monitor_bulk_data_provider.service
-sudo systemctl enable climate_monitor_websocket_server.service
-sudo systemctl start climate_monitor_websocket_server.service
+# enable and (re)start services
+services=(
+    "climate_monitor_mqtt_postgres_bridge.service"
+    "climate_monitor_summarizer.timer"
+    "climate_monitor_bulk_data_provider.service"
+    "climate_monitor_websocket_server.service"
+)
+
+for service in "${services[@]}"; do
+    sudo systemctl enable "$service"
+    sudo systemctl stop "$service" 2>/dev/null || true
+    sudo systemctl start "$service"
+    echo "started $service"
+done
