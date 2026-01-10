@@ -19,13 +19,16 @@ with engine.connect() as conn:
 lower_bound = latest_history if latest_history else '1970-01-01'
 
 query = f"""
-    SELECT sensor_id, obs_time, temp1, hum1, temp2, hum2
+    SELECT sensor_id, obs_time, temp1, hum1, temp2, hum2, co2, aqi
     FROM observations
     WHERE obs_time > '{lower_bound}'
 """
 df = pd.read_sql_query(query, engine)
 
 if not df.empty:
+    # fill in data for single sensor monitors
+    df['temp2'] = df['temp2'].fillna(df['temp1'])
+    df['hum2'] = df['hum2'].fillna(df['hum1'])
 
     df['temp'] = (df['temp1'] + df['temp2']) / 2
     df['hum'] = (df['hum1'] + df['hum2']) / 2
@@ -39,14 +42,22 @@ if not df.empty:
         'PICO_W_02': 'kitchen',
         'PICO_W_03': 'closet',
         'PICO_W_04': 'bedroom',
+        'PICO_W_05': 'couch',
+        'PICO_W_06': 'vent',
+        'PICO_W_07': 'thermostat',
     }
     df['sensor_loc'] = df['sensor_id'].map(sensor_mapping)
 
     # 3. Group by sensor_id and 5-min interval, average temp1 and hum1
     df['interval_time'] = pd.to_datetime(df['obs_time']).dt.round('5min')
     agg = (
-        df.groupby(['interval_time', 'sensor_loc'],)
-            .agg(temp=('temp_f', 'mean'), hum=('hum', 'mean'))
+        df.groupby(['interval_time', 'sensor_loc'])
+            .agg(
+                temp=('temp_f', 'mean'),
+                hum=('hum', 'mean'),
+                co2=('co2', 'mean'),
+                aqi=('aqi', 'mean'),
+            )
             .reset_index()
             .rename(columns={'interval_time': 'obs_time'})
     )
@@ -58,7 +69,7 @@ if not df.empty:
     wide = hist_5m.pivot(
         index='obs_time',
         columns='sensor_loc',
-        values=['temp', 'hum']
+        values=['temp', 'hum', 'co2', 'aqi']
     ).swaplevel(axis=1).sort_index(axis=1).reset_index()
 
     def flatten_col(col_tuple):
@@ -85,9 +96,11 @@ if not df.empty:
         for sensor in sensor_mapping.values():
             col_temp = f"sensor__{sensor}_temp"
             col_hum = f"sensor__{sensor}_hum"
+            col_co2 = f"sensor__{sensor}_co2"
+            col_aqi = f"sensor__{sensor}_aqi"
 
             # Select rows where temp or hum for the sensor is not null
-            sensor_rows = wide[wide[[col_temp, col_hum]].notnull().any(axis=1)]
+            sensor_rows = wide[wide[[col_temp, col_hum, col_co2, col_aqi]].notnull().any(axis=1)]
             if sensor_rows.empty:
                 continue  # No new data for this sensor in this batch
 

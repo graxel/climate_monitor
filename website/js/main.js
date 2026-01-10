@@ -39,8 +39,8 @@ function startWebSocket() {
     wsStatus.textContent = "WebSocket error: " + err;
     return;
   }
-  ws.onopen = () => wsStatus.textContent = "🟢 WebSocket connected";
-  ws.onclose = () => wsStatus.textContent = "🔴 WebSocket disconnected";
+  ws.onopen = () => wsStatus.textContent = "✅ WebSocket connected";
+  ws.onclose = () => wsStatus.textContent = "❌ WebSocket disconnected";
   ws.onerror = () => wsStatus.textContent = "⚠️ WebSocket error";
   ws.onmessage = evt => {
     let msg;
