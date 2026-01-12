@@ -33,4 +33,4 @@ echo "Copying CircuitPython to Pico."
 cp "$FILENAME" "$BOARD_PATH/"
 
 #echo "Installing circup.
-# command to instal
+# command to install circup

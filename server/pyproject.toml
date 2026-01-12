@@ -27,6 +27,3 @@ dev = [
 
 [tool.uv]
 default-groups = []
-
-
-Running cells with 'server (Python 3.14.0)' requires the ipykernel and pip package.
