@@ -36,6 +36,7 @@ class MqttManager:
             self.client.publish(self.topic, msg)
         except Exception as e:
             log(f"Publish failed: {e}")
+            raise
     
     def recover(self):
         import time

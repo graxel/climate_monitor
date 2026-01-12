@@ -19,39 +19,35 @@ with engine.connect() as conn:
 lower_bound = latest_history if latest_history else '1970-01-01'
 
 query = f"""
-    SELECT sensor_id, obs_time, temp1, hum1, temp2, hum2, co2, aqi
-    FROM observations
-    WHERE obs_time > '{lower_bound}'
+    SELECT
+        obs.sensor_id,
+        sens.location,
+        obs.obs_time,
+        obs.temp1,
+        obs.hum1,
+        obs.temp2,
+        obs.hum2,
+        obs.co2,
+        obs.aqi
+    FROM observations obs
+    JOIN sensors sens
+    ON obs.sensor_id = sens.sensor_id
+    WHERE obs.obs_time > '{lower_bound}'
 """
 df = pd.read_sql_query(query, engine)
 
 if not df.empty:
-    # fill in data for single sensor monitors
-    df['temp2'] = df['temp2'].fillna(df['temp1'])
-    df['hum2'] = df['hum2'].fillna(df['hum1'])
-
-    df['temp'] = (df['temp1'] + df['temp2']) / 2
-    df['hum'] = (df['hum1'] + df['hum2']) / 2
-    df['temp_diff'] = df['temp1'] - df['temp2']
-    df['hum_diff'] = df['hum1'] - df['hum2']
-
+    df['temp'] = df[['temp1', 'temp2']].mean(axis=1, skipna=True)
     df['temp_f'] = df['temp'] * 9 / 5 + 32
+    df['hum'] = df[['hum1', 'hum2']].mean(axis=1, skipna=True)
 
-    sensor_mapping = {
-        'PICO_W_01': 'office',
-        'PICO_W_02': 'kitchen',
-        'PICO_W_03': 'closet',
-        'PICO_W_04': 'bedroom',
-        'PICO_W_05': 'couch',
-        'PICO_W_06': 'vent',
-        'PICO_W_07': 'thermostat',
-    }
-    df['sensor_loc'] = df['sensor_id'].map(sensor_mapping)
-
-    # 3. Group by sensor_id and 5-min interval, average temp1 and hum1
     df['interval_time'] = pd.to_datetime(df['obs_time']).dt.round('5min')
+
+    active_sensors = df['location'].unique()
+
+    # Group by sensor location and 5-min interval
     agg = (
-        df.groupby(['interval_time', 'sensor_loc'])
+        df.groupby(['interval_time', 'location'])
             .agg(
                 temp=('temp_f', 'mean'),
                 hum=('hum', 'mean'),
@@ -68,7 +64,7 @@ if not df.empty:
     # from long format to wide
     wide = hist_5m.pivot(
         index='obs_time',
-        columns='sensor_loc',
+        columns='location',
         values=['temp', 'hum', 'co2', 'aqi']
     ).swaplevel(axis=1).sort_index(axis=1).reset_index()
 
@@ -81,7 +77,7 @@ if not df.empty:
     # flatten cols from multiindex to regular
     wide.columns = [flatten_col(col) for col in wide.columns]
 
-    # 4. Delete overlapping intervals in webpage_plot_data and insert new aggregates
+    # Delete overlapping intervals in webpage_plot_data and insert new aggregates
     with engine.begin() as conn:
 
         # Check for and add any missing columns
@@ -93,7 +89,8 @@ if not df.empty:
             pg_type = 'numeric'
             conn.execute(text(f'ALTER TABLE webpage_plot_data ADD COLUMN IF NOT EXISTS "{col}" {pg_type}'))
         
-        # Clean up ...something. Have to try and remember what this does
+        # Clear time intervals for this incoming data.
+        # If there was something there before, we're deleting it and replacing it.
         min_interval = wide['obs_time'].min()
         conn.execute(
             text("""
@@ -104,7 +101,7 @@ if not df.empty:
         )
         wide.to_sql('webpage_plot_data', conn, if_exists='append', index=False)
 
-        for sensor in sensor_mapping.values():
+        for sensor in active_sensors:
             col_temp = f"sensor__{sensor}_temp"
             col_hum = f"sensor__{sensor}_hum"
             col_co2 = f"sensor__{sensor}_co2"
