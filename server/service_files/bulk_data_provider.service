@@ -1,6 +1,8 @@
 [Unit]
 Description=Bulk data provider service for apartment climate monitor
-After=network.target
+After=network.target postgresql.service
+Wants=postgresql.service
+ConditionPathExists=__SERVER_DIR__/.env
 
 [Service]
 Type=simple
@@ -9,6 +11,10 @@ EnvironmentFile=__SERVER_DIR__/.env
 WorkingDirectory=__SERVER_DIR__
 ExecStart=__SERVER_DIR__/.venv/bin/gunicorn bulk_data_provider:app --bind 127.0.0.1:8000
 Restart=always
+RestartSec=5
+TimeoutStartSec=30
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target

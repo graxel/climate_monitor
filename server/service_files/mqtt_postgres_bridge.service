@@ -1,6 +1,8 @@
 [Unit]
 Description=MQTT to Postgres Bridge (Poetry)
-After=network.target
+After=network.target postgresql.service mosquitto.service
+Wants=postgresql.service mosquitto.service
+ConditionPathExists=__SERVER_DIR__/.env
 
 [Service]
 Type=simple
@@ -9,6 +11,10 @@ EnvironmentFile=__SERVER_DIR__/.env
 WorkingDirectory=__SERVER_DIR__
 ExecStart=__SERVER_DIR__/.venv/bin/python -u mqtt_postgres_bridge.py
 Restart=always
+RestartSec=5
+TimeoutStartSec=30
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target

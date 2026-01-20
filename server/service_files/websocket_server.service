@@ -1,6 +1,8 @@
 [Unit]
 Description=Websocket service for climate monitor website
-After=network.target
+After=network.target postgresql.service
+Wants=postgresql.service
+ConditionPathExists=__SERVER_DIR__/.env
 
 [Service]
 Type=simple
@@ -9,6 +11,10 @@ EnvironmentFile=__SERVER_DIR__/.env
 WorkingDirectory=__SERVER_DIR__
 ExecStart=__SERVER_DIR__/.venv/bin/python websocket_server.py
 Restart=always
+RestartSec=5
+TimeoutStartSec=30
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target

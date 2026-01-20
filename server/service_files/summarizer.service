@@ -1,5 +1,8 @@
 [Unit]
 Description=Prepare data for webpage
+After=network.target postgresql.service
+Wants=postgresql.service
+ConditionPathExists=__SERVER_DIR__/.env
 
 [Service]
 Type=oneshot
@@ -7,3 +10,5 @@ User=__USERNAME__
 EnvironmentFile=__SERVER_DIR__/.env
 WorkingDirectory=__SERVER_DIR__
 ExecStart=__SERVER_DIR__/.venv/bin/python summarizer.py
+StandardOutput=journal
+StandardError=journal
