@@ -67,14 +67,14 @@ def parse_sensor_data(format_spec, parts):
 
 def build_insert_query(sensor_id, obs_time, sensor_values):
     column_names = ['sensor_id', 'obs_time']
-    values = [sensor_id, obs_time]
+    values = {'sensor_id': sensor_id, 'obs_time': obs_time}
     
     for col_name in sensor_values:
         column_names.append(col_name)
-        values.append(sensor_values[col_name])
+        values[col_name] = sensor_values[col_name]
     
     columns_str = ', '.join(column_names)
-    placeholders = ', '.join(['%s'] * len(column_names))
+    placeholders = ', '.join([f':{col}' for col in column_names])
     query_with_placeholders = f"INSERT INTO observations ({columns_str}) VALUES ({placeholders})"
     
     return query_with_placeholders, values
