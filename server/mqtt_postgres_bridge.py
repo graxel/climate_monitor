@@ -1,23 +1,24 @@
 import os
 import sys
 from dotenv import load_dotenv
-import psycopg2
 from datetime import datetime
 import paho.mqtt.client as mqtt
 
+from sqlalchemy import create_engine, text
+from postgres_auth import db_writer_url
+
 load_dotenv()
 
-required_vars = ["PG_HOST", "PG_DB", "PG_USER", "PG_PASSWORD", "PG_WRITE_USER", "PG_WRITE_PASSWORD", "MQTT_BROKER", "MQTT_PORT", "MQTT_TOPIC"]
+required_vars = ["MQTT_BROKER", "MQTT_PORT", "MQTT_TOPIC"]
 
 missing = [var for var in required_vars if var not in os.environ]
 if missing:
     print(f"Missing environment variables: {', '.join(missing)}")
     sys.exit(1)
 
-PG_HOST = os.getenv("PG_HOST")
-PG_DB = os.getenv("PG_DB")
-PG_USER = os.getenv("PG_WRITE_USER")
-PG_PASSWORD = os.getenv("PG_WRITE_PASSWORD")
+
+engine = create_engine(db_writer_url)
+
 MQTT_BROKER = os.getenv("MQTT_BROKER")
 MQTT_PORT = int(os.getenv("MQTT_PORT"))  # Cast to int
 MQTT_TOPIC = os.getenv("MQTT_TOPIC")
@@ -135,28 +136,21 @@ def on_message(client, userdata, msg):
         ###############################################
         query, values = build_insert_query(sensor_id, obs_time, sensor_values)
 
-        with psycopg2.connect(
-            host=PG_HOST,
-            dbname=PG_DB,
-            user=PG_USER,
-            password=PG_PASSWORD
-        ) as conn:
-            with conn.cursor() as cur:
-                # Write data to observations table
-                cur.execute(query, values)
-
-                # Update update_status table
-                cur.execute(
-                    """
+        with engine.begin() as conn:
+            # Write data to observations table
+            conn.execute(text(query), values)
+            
+            # Update update_status table
+            conn.execute(
+                text("""
                     INSERT INTO update_status (table_name, sensor_id, last_updated)
-                    VALUES ('observations', %s, %s)
+                    VALUES ('observations', :sensor_id, :obs_time)
                     ON CONFLICT (table_name, sensor_id)
                     DO UPDATE SET last_updated = EXCLUDED.last_updated
                     WHERE update_status.last_updated < EXCLUDED.last_updated
-                    """,
-                    (sensor_id, obs_time)
-                )
-                conn.commit()
+                """),
+                {"sensor_id": sensor_id, "obs_time": obs_time}
+            )
         print(f"Inserted data from {sensor_id} at {obs_time}")
     except Exception as e:
         print(f"Error processing message: {msg.payload}")
